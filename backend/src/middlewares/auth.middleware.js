@@ -7,14 +7,14 @@ export const isLoggedin = async (req, res, next) => {
         const refreshToken = req.cookies?.refreshToken;
         if (!accessToken && !refreshToken) {
             return res.status(401).json({
-                message: "Please login to access the ",
+                message: "Please login to access the service",
                 success: false
             })
         }
         if (accessToken) {
             try {
                 const accessTokenDecoded = await jwt.verify(accessToken, process.env.ACCESSTOKEN_SECRET);
-                const user = await db.User.findUnique({
+                const user = await db.user.findUnique({
                     where: {
                         id: accessTokenDecoded.id
                     },
@@ -42,7 +42,7 @@ export const isLoggedin = async (req, res, next) => {
             })
         }
         const refreshTokenDecoded = await jwt.verify(refreshToken, process.env.REFRESHTOKEN_SECRET);
-        const user = await db.User.findUnique({
+        const user = await db.user.findUnique({
             where: {
                 id: refreshTokenDecoded.id
             },
@@ -62,7 +62,7 @@ export const isLoggedin = async (req, res, next) => {
         }
         const newRefreshToken = await jwt.sign({ id: user.id }, process.env.REFRESHTOKEN_SECRET, { expiresIn: process.env.REFRESHTOKEN_EXPIRY || "1d" });
         const newAccessToken = await jwt.sign({ id: user.id }, process.env.ACCESSTOKEN_SECRET, { expiresIn: process.env.ACCESSTOKEN_EXPIRY || "15m" });
-        await db.User.update(
+        await db.user.update(
             {
                 where: {
                     id: user.id
@@ -103,7 +103,7 @@ export const isAdmin = async (req, res, next) => {
                 success: false
             })
         }
-        const user = await db.User.findUnique({
+        const user = await db.user.findUnique({
             where: {
                 id: userId
             },

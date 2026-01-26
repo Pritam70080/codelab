@@ -38,8 +38,9 @@ model User {
   updatedAt         DateTime @updatedAt
 
   problems      Problem[]   //The problem he created (as admin)
-  // submissions   Submission[]
-  // problemSolved ProblemSolved[]
+  submissions   Submission[] //the submission user made, by solving the problem (Either right or wrong)
+  problemSolved ProblemSolved[]//the problems that are successfully solved (Marked as done)
+
   // playlists Playlist[]
 } 
 
@@ -63,7 +64,71 @@ model Problem {
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  submissions Submission[]//for the problem all the submissions
+  solvedBy ProblemSolved[]//for the problem those who solved it successfully
   
   //relationships
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) //relation with user who created this problem
+}
+
+model Submission {
+  id String @id @default(uuid())
+  userId String
+  problemId String
+  sourceCode Json
+  language String
+  stdin String?
+  stdout String?
+  stderr String?
+  compileOutput String?
+  status String 
+  memory String?
+  time String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  testCaseResults TestCaseResult[]
+
+  //relationship
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)// relation with user by whom the submission is made
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)// relation with problem for which submission is made
+}
+
+model TestCaseResult {
+  id String @id @default(uuid())
+  submissionId String
+  testCase Int
+  passed Boolean
+  stdout String?
+  expected String
+  stderr String?
+  compiledOutput String?
+  status String
+  memory String?
+  time String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //relationship
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade) //relation with submission for which submission the testcases are
+
+  @@index([submissionId]) //ease to find by submissionId
+}
+
+model ProblemSolved {
+  id String @id @default(uuid())
+  userId String
+  problemId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //relationship
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)// relation with user who solved the problem successfully(maked as done)
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)// relation with problem which is solved
+
+  @@unique([userId, problemId])//both userId and problemId together uniquely define the tuple ensuring no duplicate maked as done
 }

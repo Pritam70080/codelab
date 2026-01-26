@@ -14,7 +14,6 @@ const sendVerificationEmail = async (email, token) => {
         });
         //Verification URL
         const verificationUrl = `${process.env.BASE_URL}/api/v1/auth/verify/${token}`;
-        console.log(verificationUrl);
         //Email content
         const mailOptions = {
             from: `"CodeLab" <support.codelab@gmail.com>`,

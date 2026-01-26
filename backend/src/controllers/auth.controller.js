@@ -14,7 +14,7 @@ export const register = async (req, res) => {
                 success: false
             })
         }
-        const existingUser = await db.User.findUnique({
+        const existingUser = await db.user.findUnique({
             where: {
                 email
             }
@@ -28,7 +28,7 @@ export const register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const verificationToken = await jwt.sign({ id: email }, process.env.VERIFICATION_SECRET, { expiresIn: process.env.VERIFICATION_EXPIRY || "10m" });
-        const newUser = await db.User.create({
+        const newUser = await db.user.create({
             data: {
                 name,
                 email,
@@ -82,7 +82,7 @@ export const verifyEmail = async (req, res) => {
             });
         }
         const decoded = await jwt.verify(token, process.env.VERIFICATION_SECRET);
-        const user = await db.User.findUnique({
+        const user = await db.user.findUnique({
             where: {
                 email: decoded.id,
                 verificationToken: token
@@ -94,7 +94,7 @@ export const verifyEmail = async (req, res) => {
                 success: false
             });
         }
-        await db.User.update({
+        await db.user.update({
             where: {
                 id: user.id
             },
@@ -125,7 +125,7 @@ export const login = async (req, res) => {
                 success: false
             })
         }
-        const user = await db.User.findUnique({
+        const user = await db.user.findUnique({
             where: {
                 email
             }
@@ -151,7 +151,7 @@ export const login = async (req, res) => {
         }  
         const accessToken = await jwt.sign({id: user.id}, process.env.ACCESSTOKEN_SECRET, {expiresIn: process.env.ACCESSTOKEN_EXPIRY});
         const refreshToken = await jwt.sign({id: user.id}, process.env.REFRESHTOKEN_SECRET, {expiresIn: process.env.REFRESHTOKEN_EXPIRY});
-        await db.User.update({
+        await db.user.update({
             where: {
                 id: user.id
             },
@@ -210,7 +210,7 @@ export const getProfile = async (req, res) => {
 export const logout = async (req, res) => {
     try {
         const user = req.user;
-        await db.User.update({
+        await db.user.update({
             where: {
                 id: user.id
             },

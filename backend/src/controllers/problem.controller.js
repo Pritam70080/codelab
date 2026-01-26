@@ -46,7 +46,7 @@ export const createProblem = async (req, res) => {
                 }
             }
         }
-        const newProblem = await db.Problem.create({
+        const newProblem = await db.problem.create({
             data: {
                 title,
                 description,
@@ -84,7 +84,7 @@ export const createProblem = async (req, res) => {
 
 export const getAllProblems = async (req, res) => {
     try {
-        const allProblems = await db.Problem.findMany();
+        const allProblems = await db.problem.findMany();
         if (!allProblems) {
             return res.status(404).json({
                 message: "No problem found",
@@ -108,7 +108,7 @@ export const getAllProblems = async (req, res) => {
 export const getProblemById = async (req, res) => {
     try {
         const { id } = req.params;
-        const problem = await db.Problem.findUnique({
+        const problem = await db.problem.findUnique({
             where: {
                 id
             }
@@ -136,7 +136,7 @@ export const getProblemById = async (req, res) => {
 export const deleteProblem = async (req, res) => {
     try {
         const { id } = req.params;
-        const problem = await db.Problem.delete({
+        const problem = await db.problem.delete({
             where: {
                 id
             }
@@ -164,7 +164,7 @@ export const updateProblem = async (req, res) => {
     try {
         const { title, description, tags, difficulty, examples, constraints, hint, editorial, testCases, codeSnippets, referenceSolutions } = req.body;
         const { id } = req.params;
-        const problem = await db.Problem.findUnique({
+        const problem = await db.problem.findUnique({
             where: { id }
         });
         if (!problem) {
@@ -214,7 +214,7 @@ export const updateProblem = async (req, res) => {
                 }
             }
         }
-        const updatedProblem = await db.Problem.update({
+        const updatedProblem = await db.problem.update({
             where: {
                 id
             },
@@ -253,6 +253,34 @@ export const updateProblem = async (req, res) => {
     }
 }
 
-// export const getAllProblemsSolvedByUser = async (req, res) => {
-
-// }
+export const getAllProblemsSolvedByUser = async (req, res) => {
+    try {
+        const solvedProblems = await db.problem.findMany({
+            where: {
+                solvedBy: {
+                    some: {
+                        userId: req.user.id
+                    }
+                }
+            },
+            include: {
+                solvedBy: {
+                    where: {
+                        userId: req.user.id
+                    }
+                }
+            }
+        });
+        return res.status(200).json({
+            success: true,
+            message: "Problems fetched successfully",
+            problems: solvedProblems
+        })
+    } catch (error) {
+        console.error("Error fetching the solved problems:", error);
+        return res.status(500).json({
+            message: "Internal server error",
+            success: false
+        })
+    }
+}
