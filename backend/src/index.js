@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-import {authRouter, executionRouter, problemRouter, submissionRouter} from "./routes/index.js";
+import {authRouter, executionRouter, playlistRouter, problemRouter, submissionRouter} from "./routes/index.js";
 
 dotenv.config();
 
@@ -27,6 +27,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/problems", problemRouter);
 app.use("/api/v1/execute-code", executionRouter);
 app.use("/api/v1/submission", submissionRouter);
+app.use("/api/v1/playlist", playlistRouter);
 
 const PORT = process.env.PORT || 8080;
 

@@ -31,60 +31,61 @@ model User {
   image             String?
   role              UserRole @default(USER)
   password          String
-  verificationToken String?  
+  verificationToken String?
   refreshToken      String?
   isVerified        Boolean  @default(false)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  problems      Problem[]   //The problem he created (as admin)
+  problems      Problem[] //The problem he created (as admin)
   submissions   Submission[] //the submission user made, by solving the problem (Either right or wrong)
-  problemSolved ProblemSolved[]//the problems that are successfully solved (Marked as done)
+  problemSolved ProblemSolved[] //the problems that are successfully solved (Marked as done)
 
-  // playlists Playlist[]
-} 
+  playlists Playlist[]
+}
 
 model Problem {
-  id String @id @default(uuid())
-  title String
+  id          String     @id @default(uuid())
+  title       String
   description String
-  difficulty Difficulty
-  tags String[]//["tag1", "tag2", "tag3"]
+  difficulty  Difficulty
+  tags        String[] //["tag1", "tag2", "tag3"]
 
   userId String
-  
-  examples Json
+
+  examples    Json
   constraints String
-  hint String?
-  editorial String?
-  
-  testCases Json //{{"input": 4}, "output": 6}}
-  codeSnippets Json
+  hint        String?
+  editorial   String?
+
+  testCases          Json //{{"input": 4}, "output": 6}}
+  codeSnippets       Json
   referenceSolutions Json
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  submissions Submission[]//for the problem all the submissions
-  solvedBy ProblemSolved[]//for the problem those who solved it successfully
-  
+  submissions      Submission[] //for the problem all the submissions
+  solvedBy         ProblemSolved[] //for the problem those who solved it successfully
+  inPlaylist ProblemsInPlaylist[]
+
   //relationships
   user User @relation(fields: [userId], references: [id], onDelete: Cascade) //relation with user who created this problem
 }
 
 model Submission {
-  id String @id @default(uuid())
-  userId String
-  problemId String
-  sourceCode Json
-  language String
-  stdin String?
-  stdout String?
-  stderr String?
+  id            String  @id @default(uuid())
+  userId        String
+  problemId     String
+  sourceCode    Json
+  language      String
+  stdin         String?
+  stdout        String?
+  stderr        String?
   compileOutput String?
-  status String 
-  memory String?
-  time String
+  status        String
+  memory        String?
+  time          String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -92,22 +93,22 @@ model Submission {
   testCaseResults TestCaseResult[]
 
   //relationship
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)// relation with user by whom the submission is made
-  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)// relation with problem for which submission is made
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade) // relation with user by whom the submission is made
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade) // relation with problem for which submission is made
 }
 
 model TestCaseResult {
-  id String @id @default(uuid())
-  submissionId String
-  testCase Int
-  passed Boolean
-  stdout String?
-  expected String
-  stderr String?
+  id             String  @id @default(uuid())
+  submissionId   String
+  testCase       Int
+  passed         Boolean
+  stdout         String?
+  expected       String
+  stderr         String?
   compiledOutput String?
-  status String
-  memory String?
-  time String?
+  status         String
+  memory         String?
+  time           String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -119,16 +120,46 @@ model TestCaseResult {
 }
 
 model ProblemSolved {
-  id String @id @default(uuid())
-  userId String
+  id        String @id @default(uuid())
+  userId    String
   problemId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   //relationship
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)// relation with user who solved the problem successfully(maked as done)
-  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)// relation with problem which is solved
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade) // relation with user who solved the problem successfully(maked as done)
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade) // relation with problem which is solved
 
-  @@unique([userId, problemId])//both userId and problemId together uniquely define the tuple ensuring no duplicate maked as done
+  @@unique([userId, problemId]) //both userId and problemId together uniquely define the tuple ensuring no duplicate maked as done
+}
+
+model Playlist {
+  id          String @id @default(uuid())
+  name        String
+  description String?
+  userId      String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  problems ProblemsInPlaylist[] //list of problems in a playlist
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([name, userId]) //unique playlist name per user
+}
+
+model ProblemsInPlaylist {
+  id         String @id @default(uuid())
+  playlistId String
+  problemId  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  playlist Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  problem  Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([playlistId, problemId])
 }
