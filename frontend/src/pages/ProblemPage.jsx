@@ -1,8 +1,8 @@
 import React from 'react'
-import {motion} from "motion/react";
-import { pageTransition } from '../lib/pageTransition.js';
+import {pageTransition} from "../lib/pageTransition.js";
+import { motion } from 'motion/react';
 
-const AboutPage = () => {
+const ProblemPage = () => {
   return (
     <motion.div
       variants={pageTransition}
@@ -12,10 +12,9 @@ const AboutPage = () => {
 
       className="border min-h-screen pt-20"
     >
-      
-      About
+      ProblemPage
     </motion.div>
   )
 }
 
-export default AboutPage
+export default ProblemPage

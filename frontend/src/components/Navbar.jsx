@@ -215,16 +215,16 @@ const Navbar = () => {
             }
             <ul className="space-y-6 text-lg font-medium">
               {navItems.map(({ id, path, label }) => {
-                return <li key={id} className=" mt-4"><Link to={path}>{label}</Link></li>
+                return <li key={id} className=" mt-4"><NavLink to={path} className={({isActive}) => `${isActive ? "text-primary" : ""}`}>{label}</NavLink></li>
               })}
             </ul>
-            <div className="py-8">
+            <div className="pt-2 pb-6 border-t border-base-content/20 mt-6">
               <h2 className="text-lg font-medium mb-4">Theme</h2>
               <div className="flex flex-wrap gap-4 justify-center items-center mb-10">
-                <button onClick={() => setTheme("corporate")} className={`btn btn-sm ${theme === "corporate" ? "btn-primary" : "bg-base-100 border-primary"}`}>Light</button>
-                <button onClick={() => setTheme("dark")} className={`btn btn-sm ${theme === "dark" ? "btn-primary" : "bg-base-100 border-primary"}`}>Dark</button>
-                <button onClick={() => setTheme("lemonade")} className={`btn btn-sm ${theme === "lemonade" ? "btn-primary" : "bg-base-100 border-primary"}`}>Lemonade</button>
-                <button onClick={() => setTheme("dim")} className={`btn btn-sm ${theme === "dim" ? "btn-primary" : "bg-base-100 border-primary"}`}>Dim</button>
+                <button onClick={() => setTheme("corporate")} className={`btn btn-sm text-base-content ${theme === "corporate" ? "btn-primary " : "bg-base-100 border-primary"}`}>Light</button>
+                <button onClick={() => setTheme("dark")} className={`btn btn-sm text-base-content ${theme === "dark" ? "btn-primary " : "bg-base-100 border-primary"}`}>Dark</button>
+                <button onClick={() => setTheme("lemonade")} className={`btn btn-sm text-base-content ${theme === "lemonade" ? "btn-primary " : "bg-base-100 border-primary"}`}>Lemonade</button>
+                <button onClick={() => setTheme("dim")} className={`btn btn-sm text-base-content ${theme === "dim" ? "btn-primary " : "bg-base-100 border-primary"}`}>Dim</button>
               </div>
 
               {authUser ? (

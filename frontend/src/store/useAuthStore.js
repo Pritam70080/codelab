@@ -44,7 +44,6 @@ export const useAuthStore = create((set) => ({
         try {
             const {data} = await axiosInstance.get("/auth/get-profile");
             set({authUser: data.user});
-            toast.success(data.message);
         } catch (error) {
             console.error("Error checking auth", error);
         } finally {

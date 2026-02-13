@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json());
 app.use(urlencoded({extended: true}));
 app.use(cors({
-    origin: process.env.BASE_URL,
+    origin: ["http://localhost:5173", process.env.BASE_URL],
     allowedHeaders: ["Content-Type", "Authorization"],
     methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS"],
     credentials: true
@@ -28,6 +28,7 @@ app.use("/api/v1/problems", problemRouter);
 app.use("/api/v1/execute-code", executionRouter);
 app.use("/api/v1/submission", submissionRouter);
 app.use("/api/v1/playlist", playlistRouter);
+
 
 const PORT = process.env.PORT || 8080;
 

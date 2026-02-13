@@ -7,16 +7,14 @@ import { StickyNote, Code, ChevronDown } from "lucide-react";
 const codeSnippet = 
 `function twoSum(nums, target) {
   const map = new Map();
-
   for (let i = 0; i < nums.length; i++) {
-    const need = target - nums[i];
-
-    if (map.has(need)) {
-      return [map.get(need), i];
+    const complement = target - nums[i];
+    if (map.has(complement)) {
+      return [map.get(complement), i];
     }
-
     map.set(nums[i], i);
   }
+  return [];
 }`;
 
 
@@ -147,7 +145,7 @@ const LandingPage = () => {
                 <motion.pre
                   animate={{ opacity: [0.85, 1, 0.85] }}
                   transition={{ duration: 3, repeat: Infinity }}
-                  className="p-6 text-sm font-mono leading-relaxed text-base-content whitespace-pre"
+                  className="py-4 px-12 text-justify text-sm font-mono leading-relaxed text-base-content whitespace-pre"
                 >
                   {codeSnippet}
                 </motion.pre>

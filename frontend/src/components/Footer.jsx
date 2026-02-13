@@ -31,6 +31,7 @@ const Footer = () => {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeIn" } }}
       viewport={{ once: true, amount: 0.4 }}
+      exit={{opacity: 0, y: 20}}
       className="">
       <hr style={{ opacity: 0.2 }} />
       <div className="grid sm:grid-cols-2 md:grid-cols-3 mt-4 gap-5 md:gap-30 px-4">
