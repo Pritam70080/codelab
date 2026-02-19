@@ -1,14 +1,14 @@
-import React,{useState, useMemo} from 'react';
-import {motion} from "motion/react";
-import {Link} from "react-router-dom";
-import {Plus} from "lucide-react";
+import React, { useState, useMemo } from 'react';
+import { motion } from "motion/react";
+import { Link } from "react-router-dom";
+import { Plus, Bookmark, ChevronLeft, ChevronRight } from "lucide-react";
 
-import {useAuthStore} from "../store/useAuthStore.js";
+import { useAuthStore } from "../store/useAuthStore.js";
 import { useThemeStore } from '../store/useThemeStore.js';
 
-const ProblemTable = ({problems}) => {
-  const {authUser} = useAuthStore();
-  const {theme} = useThemeStore();
+const ProblemTable = ({ problems }) => {
+  const { authUser } = useAuthStore();
+  const { theme } = useThemeStore();
   const [difficulty, setDifficulty] = useState("ALL");
   const [search, setSearch] = useState("");
   const [selectedTag, setselectedTag] = useState("ALL");
@@ -20,7 +20,7 @@ const ProblemTable = ({problems}) => {
     lemonade: "bg-neutral-50/20",
     dim: "bg-base-200"
   }
-  const theadBg= {
+  const theadBg = {
     corporate: "bg-primary/50",
     dark: "bg-base-300",
     lemonade: "bg-primary/50",
@@ -29,7 +29,7 @@ const ProblemTable = ({problems}) => {
 
   const difficulties = ["EASY", "MEDIUM", "HARD"];
   const allTags = useMemo(() => {
-    if(!Array.isArray(problems)) return [];
+    if (!Array.isArray(problems)) return [];
     const tagsSet = new Set();
     problems.forEach((problem) => problem.tags?.forEach((tag) => tagsSet.add(tag)));
     return Array.from(tagsSet);
@@ -37,18 +37,24 @@ const ProblemTable = ({problems}) => {
 
   const filteredProblems = useMemo(() => {
     return (problems || [])
-    .filter((problem) => problem.title.toLowerCase().includes(search.toLowerCase()))
-    .filter((problem) => difficulty === "ALL" ? true: problem.difficulty === difficulty)
-    .filter((problem) => selectedTag === "ALL"? true: problem.tags.includes(selectedTag))
+      .filter((problem) => problem.title.toLowerCase().includes(search.toLowerCase()))
+      .filter((problem) => difficulty === "ALL" ? true : problem.difficulty === difficulty)
+      .filter((problem) => selectedTag === "ALL" ? true : problem.tags.includes(selectedTag))
   }, [problems, search, difficulty, selectedTag])
 
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(problems.length / itemsPerPage);
+
+  const paginatedProblems = useMemo(() => {
+    return filteredProblems.slice((currentPageNo - 1) * itemsPerPage, currentPageNo * itemsPerPage);
+  }, [currentPageNo, filteredProblems]);
 
   return (
     <motion.div
-    initial={{opacity: 0, scale: 0.95}}
-    animate={{opacity: 1, scale: 1}}
-    transition={{duration: 0.3, delay: 0.2, ease: "easeOut"}}
-    className="mt-10 px-2">
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3, delay: 0.2, ease: "easeOut" }}
+      className="mt-10 px-2">
       <div className="md:text-right">
         <button className="btn btn-outline btn-primary rounded-xl">
           <Plus className="w-4 h-4" />
@@ -66,14 +72,15 @@ const ProblemTable = ({problems}) => {
         </select>
         <select className="select select-sm bg-base-200" value={selectedTag} onChange={(e) => setselectedTag(e.target.value)}>
           <option value="ALL">All Tags</option>
-           {allTags.map((tag) => (
+          {allTags.map((tag) => (
             <option key={tag} value={tag}>{tag.toString().toLowerCase()}</option>
           ))}
         </select>
       </div>
+      {/* Problems */}
       <div className="overflow-x-auto mt-4 rounded-lg shadow-md">
-        <table className={`table table-md table-zebra ${tableBg[theme]}`}>
-          <thead className={`${theadBg[theme]} text-base-content` }>
+        <table className={`table table-md ${tableBg[theme]}`}>
+          <thead className={`${theadBg[theme]} text-base-content`}>
             <tr>
               <th>Solved</th>
               <th>Title</th>
@@ -83,20 +90,41 @@ const ProblemTable = ({problems}) => {
             </tr>
           </thead>
           <tbody>
-            {filteredProblems.map((problem) => (
-              <tr key={problem.id}>
-                <td></td>
-                <td>
-                  <Link to={`/problems/${problem.id}`} className="font-semibold hover:underline">{problem.title}</Link>
-                </td>
-                <td>{problem.tags.map((tag) => (
-                  <span className="badge mx-3 badge-accent badge-outline">{tag}</span>
-                ))}</td>
-                <td>{problem.difficulty.charAt(0).toUpperCase() + problem.difficulty.slice(1).toLowerCase()}</td>
-              </tr>
-            ))}
+            {
+              paginatedProblems.length > 0 ?
+                paginatedProblems.map((problem) => {
+                  // console.log(problem);
+                  const isSolved = problem.solvedBy.some((user) => user.userId === authUser.id);
+                  return (
+                    <tr key={problem.id}>
+                      <td><input type="checkbox" checked={isSolved} readOnly className="checkbox checkbox-sm checkbox-success pointer-events-none" /></td>
+                      <td><Link to={`/problem/${problem.id}`}><span className="hover:link font-semibold">{problem.title}</span></Link></td>
+                      <td><div className="flex flex-wrap gap-1">
+                        {(problem.tags || []).map((tag, idx) => (
+                          <span
+                            key={idx}
+                            className={`badge badge-outline ${theme === "lemonade" ? "badge-primary" : "badge-warning"} text-xs font-bold`}
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div></td>
+                      <td ><span className={`badge text-xs text-white font-semibold ${problem.difficulty === "EASY" ? "badge-success" : problem.difficulty === "MEDIUM" ? "badge-warning" : "badge-error"}`}>{problem.difficulty.charAt(0).toUpperCase() + problem.difficulty.slice(1).toLowerCase()}</span></td>
+                      <td></td>
+                    </tr>)
+                }) :
+                <tr>
+                  <td colSpan={5} className="text-gray-400 text-center py-6">No Problem Found</td>
+                </tr>
+            }
           </tbody>
         </table>
+      </div>
+      {/* Pagination */}
+      <div className="flex justify-center gap-2 mt-4">
+        <button className="btn btn-outline btn-primary btn-sm" onClick={() => setCurrentPageNo((prev) => prev - 1)} disabled={currentPageNo === 1}><ChevronLeft /></button>
+        <span className="" >{`${currentPageNo} / ${totalPages}`}</span>
+        <button className="btn btn-outline btn-primary btn-sm" onClick={() => setCurrentPageNo((prev) => prev + 1)} disabled={currentPageNo === totalPages}><ChevronRight /></button>
       </div>
     </motion.div>
   )

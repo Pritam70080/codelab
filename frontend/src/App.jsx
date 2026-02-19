@@ -11,6 +11,8 @@ import LandingPage from './pages/LandingPage.jsx';
 import PageNotFound from './pages/PageNotFound.jsx';
 import AboutPage from './pages/AboutPage.jsx';
 import ProblemPage from './pages/ProblemPage.jsx';
+import AddProblem from './pages/AddProblem.jsx';
+import AdminRoute from './components/AdminRoute.jsx';
 
 import { useThemeStore } from './store/useThemeStore.js';
 import { useAuthStore } from './store/useAuthStore.js';
@@ -48,6 +50,9 @@ const App = () => {
             <Route index element={<LandingPage />} />
             <Route path="/problems" element={authUser ? <HomePage /> : <Navigate to="/login" />} />
             <Route path="/about" element={<AboutPage />} />
+          </Route>
+          <Route path="/problem" element={<AdminRoute/>}>
+            <Route path="add-problem" element={authUser ? <AddProblem/>: <Navigate to="/login" />}/>
           </Route>
           <Route path="/problem/:id" element={authUser ? <ProblemPage /> : <Navigate to="/login" />} />
           <Route path="*" element={<PageNotFound />} />

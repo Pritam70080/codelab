@@ -123,7 +123,7 @@ const Navbar = () => {
                     {authUser?.role === "ADMIN" && (
                       <li>
                         <Link
-                          to="/add-problem"
+                          to="/problem/add-problem"
                           className="hover:bg-primary hover:text-white text-base font-semibold"
                         >
                           <Code className="w-4 h-4 mr-1" />
@@ -202,7 +202,7 @@ const Navbar = () => {
                   {authUser?.role === "ADMIN" && (
                     <li className="mb-2.5 bg-base-100/50 p-2.5 rounded-sm">
                       <Link
-                        to="/add-problem"
+                        to="/problem/add-problem"
                         className="text-lg font-medium "
                       >
 

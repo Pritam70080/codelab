@@ -84,7 +84,9 @@ export const createProblem = async (req, res) => {
 
 export const getAllProblems = async (req, res) => {
     try {
-        const allProblems = await db.problem.findMany();
+        const allProblems = await db.problem.findMany({
+            include: {solvedBy: true}
+        });
         if (!allProblems) {
             return res.status(404).json({
                 message: "No problem found",
@@ -111,6 +113,9 @@ export const getProblemById = async (req, res) => {
         const problem = await db.problem.findUnique({
             where: {
                 id
+            },
+            include: {
+                solvedBy: true
             }
         });
         if (!problem) {
