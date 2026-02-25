@@ -1,10 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
-import { Plus, Bookmark, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Bookmark, ChevronLeft, ChevronRight, Pen, Trash } from "lucide-react";
 
 import { useAuthStore } from "../store/useAuthStore.js";
 import { useThemeStore } from '../store/useThemeStore.js';
+import { usePlaylistStore } from "../store/usePlaylistStore.js";
+import CreatePlaylistModal from "./CreatePlaylistModal.jsx";
+import AddToPlaylistModal from './AddToPlaylistModal.jsx';
 
 const ProblemTable = ({ problems }) => {
   const { authUser } = useAuthStore();
@@ -13,6 +16,10 @@ const ProblemTable = ({ problems }) => {
   const [search, setSearch] = useState("");
   const [selectedTag, setselectedTag] = useState("ALL");
   const [currentPageNo, setCurrentPageNo] = useState(1);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const { createPlaylist } = usePlaylistStore();
+  const [isAddToPlaylistModalOpen, setIsAddToPlaylistModalOpen] = useState(false);
+  const [selectedProblemId, setSelectedProblemId] = useState("");
 
   const tableBg = {
     corporate: "bg-neutral-50/20",
@@ -49,6 +56,15 @@ const ProblemTable = ({ problems }) => {
     return filteredProblems.slice((currentPageNo - 1) * itemsPerPage, currentPageNo * itemsPerPage);
   }, [currentPageNo, filteredProblems]);
 
+  const handleCreatePlaylist = async (data) => {
+    await createPlaylist(data);
+  }
+
+  const handleAddToPlaylist = (problemId) => {
+    setSelectedProblemId(problemId);
+    setIsAddToPlaylistModalOpen(true);
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -56,7 +72,7 @@ const ProblemTable = ({ problems }) => {
       transition={{ duration: 0.3, delay: 0.2, ease: "easeOut" }}
       className="mt-10 px-2">
       <div className="md:text-right">
-        <button className="btn btn-outline btn-primary rounded-xl">
+        <button className="btn btn-outline btn-primary rounded-xl" onClick={() => setIsCreateModalOpen(true)}>
           <Plus className="w-4 h-4" />
           Create Playlist
         </button>
@@ -86,7 +102,7 @@ const ProblemTable = ({ problems }) => {
               <th>Title</th>
               <th>Tags</th>
               <th>Difficulty</th>
-              <th>Action</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -110,7 +126,20 @@ const ProblemTable = ({ problems }) => {
                         ))}
                       </div></td>
                       <td ><span className={`badge text-xs text-white font-semibold ${problem.difficulty === "EASY" ? "badge-success" : problem.difficulty === "MEDIUM" ? "badge-warning" : "badge-error"}`}>{problem.difficulty.charAt(0).toUpperCase() + problem.difficulty.slice(1).toLowerCase()}</span></td>
-                      <td></td>
+                      <td>
+                        <div className="flex flex-col md:flex-row md:items-center gap-4">
+                          {authUser.role === "ADMIN" &&
+                            <div className="flex gap-2 items-center">
+                              <button className="btn btn-sm btn-info rounded-xl"><Pen className="size-4" /></button>
+                              <button className="btn btn-sm btn-error rounded-xl"><Trash className="size-4" /></button>
+                            </div>
+                          }
+                          <button className="btn btn-primary btn-sm rounded-xl" onClick={() => handleAddToPlaylist(problem.id)}>
+                            <Bookmark className="size-4" />
+                            <span className="hidden md:inline">Add to Playlist</span>
+                          </button>
+                        </div>
+                      </td>
                     </tr>)
                 }) :
                 <tr>
@@ -126,6 +155,19 @@ const ProblemTable = ({ problems }) => {
         <span className="" >{`${currentPageNo} / ${totalPages}`}</span>
         <button className="btn btn-outline btn-primary btn-sm" onClick={() => setCurrentPageNo((prev) => prev + 1)} disabled={currentPageNo === totalPages}><ChevronRight /></button>
       </div>
+
+      {/* Modals */}
+      <CreatePlaylistModal
+        isOpen={isCreateModalOpen}
+        onSubmit={handleCreatePlaylist}
+        onClose={() => setIsCreateModalOpen(false)} />
+
+      <AddToPlaylistModal
+        isOpen={isAddToPlaylistModalOpen}
+        onClose={() => setIsAddToPlaylistModalOpen(false)}
+        problemId={selectedProblemId}
+      />
+
     </motion.div>
   )
 }
