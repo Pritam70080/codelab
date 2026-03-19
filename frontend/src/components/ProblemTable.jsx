@@ -114,7 +114,9 @@ const ProblemTable = ({ problems }) => {
                   return (
                     <tr key={problem.id}>
                       <td><input type="checkbox" checked={isSolved} readOnly className="checkbox checkbox-sm checkbox-success pointer-events-none" /></td>
-                      <td><Link to={`/problem/${problem.id}`}><span className="hover:link font-semibold">{problem.title}</span></Link></td>
+                      <td><Link to={`/problem/${problem.id}`}><span className="hover:link font-semibold">{problem.title}</span></Link>
+                      {problem.title === "Add Two Numbers" && <span className="badge badge-sm ml-2 badge-secondary">Demo</span>}
+                      </td>
                       <td><div className="flex flex-wrap gap-1">
                         {(problem.tags || []).map((tag, idx) => (
                           <span

@@ -56,7 +56,7 @@ const LandingPage = () => {
         <h1 className="text-4xl md:text-7xl font-semibold forn-mono mt-8 tracking-wide leading-tight">Start Your <span className="text-primary underline ">DSA</span> Journey With <br /><span className="text-primary ">CodeLab</span></h1>
         <p className="md:text-lg mt-5">Learn, practice, and master coding with <span className="text-primary">structured sheets</span> and <span className="text-primary">real-world problems</span> — all in one place.</p>
         <div className="flex flex-col md:flex-row gap-5 justify-center mt-8 md:mt-5">
-          <Link to="/home">
+          <Link to="/problems">
             <motion.button
               initial={{ scale: 1 }}
               whileHover={{ scale: 1.03 }}

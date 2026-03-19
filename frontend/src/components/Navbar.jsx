@@ -37,8 +37,7 @@ const Navbar = () => {
     corporate: "bg-neutral-100/40",
     dark: "bg-neutral-500/10",
     lemonade: "bg-neutral-100/30",
-    dracula: "bg-neutral-500/10",
-    sunset: "bg-neutral-500/10"
+    dim: "bg-neutral-500/10",
   }
   return (
     <>

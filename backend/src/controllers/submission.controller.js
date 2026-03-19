@@ -1,4 +1,4 @@
-import {db} from "../libs/db.js";
+import { db } from "../libs/db.js";
 
 export const getAllSubmissions = async (req, res) => {
     try {
@@ -9,7 +9,7 @@ export const getAllSubmissions = async (req, res) => {
             }
         });
 
-        if(!submissions) return res.status(404).json({
+        if (!submissions) return res.status(404).json({
             message: "No submissions found",
             success: true
         })
@@ -29,7 +29,7 @@ export const getAllSubmissions = async (req, res) => {
 
 export const getSubmissionsForProblem = async (req, res) => {
     try {
-        const {problemId} = req.params;
+        const { problemId } = req.params;
         const userId = req.user.id;
 
         const submissions = await db.submission.findMany({
@@ -38,7 +38,7 @@ export const getSubmissionsForProblem = async (req, res) => {
                 problemId
             }
         });
-        if(!submissions) return res.status(404).json({
+        if (!submissions) return res.status(404).json({
             message: "No submission found",
             success: true
         });
