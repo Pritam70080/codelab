@@ -11,10 +11,12 @@ import {
   BookOpen,
   CheckCircle2,
   Download,
+  Home,
+  ChevronLeft,
 } from "lucide-react";
 import Editor from "@monaco-editor/react";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { axiosInstance } from "../lib/axios"
 import { useThemeStore } from '../store/useThemeStore.js';
@@ -68,14 +70,14 @@ const CreateProblemForm = () => {
   const [isCreatingProblem, setIsCreatingProblem] = useState(false);
   const [sampleType, setSampleType] = useState("DP")
   const navigation = useNavigate();
-  const {theme} = useThemeStore();
+  const { theme } = useThemeStore();
 
   const onSubmit = async (data) => {
     setIsCreatingProblem(true);
     try {
       const res = await axiosInstance.post("/problems/create-problem", data);
       toast.success(res.data.message || "Problem created successfully ⚡");
-      navigation("/");
+      reset();
     } catch (error) {
       toast.error("Error creating problem !");
       console.error("Failed to create problem", error);
@@ -590,6 +592,12 @@ public class Main {
     <div className="card bg-base-100 shadow-xl">
       <div className="card-body p-6 md:p-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 pb-4 border-b">
+          <div>
+            <Link to="/problems" className="btn btn-primary pl-0.5 pr-2">
+            <ChevronLeft className="size-6"/>
+            <Home className="size-6"/>
+            </Link>
+          </div>
           <h2 className="card-title text-2xl md:text-3xl flex items-center gap-3">
             <FileText className="w-6 h-6 md:w-8 md:h-8 text-primary" />
             Create Problem
@@ -849,7 +857,7 @@ public class Main {
                             <Editor
                               height="300px"
                               language={language.toLowerCase()}
-                              theme={`${theme === "corporate" || theme === "lemonade" ? "vs-light" : "vs-dark" }`}
+                              theme={`${theme === "corporate" || theme === "lemonade" ? "vs-light" : "vs-dark"}`}
                               value={field.value}
                               onChange={field.onChange}
                               options={{
@@ -890,7 +898,7 @@ public class Main {
                             <Editor
                               height="300px"
                               language={language.toLowerCase()}
-                              theme={`${theme === "corporate" || theme === "lemonade" ? "vs-light" : "vs-dark" }`}
+                              theme={`${theme === "corporate" || theme === "lemonade" ? "vs-light" : "vs-dark"}`}
                               value={field.value}
                               onChange={field.onChange}
                               options={{

@@ -260,9 +260,9 @@ const ProblemPage = () => {
         </div>
       </nav>
       <div className="container p-2 mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-1 lg:grid-cols-18 gap-2.5">
           {/* Left Side Description */}
-          <div className="card bg-base-100 shadow-xl ">
+          <div className="card bg-base-100 shadow-xl col-span-8">
             <div className="card-body p-0">
               {/* Tabs */}
               <div className="tabs tabs-bordered shadow-sm bg-base-200/80 rounded-t-lg">
@@ -312,7 +312,7 @@ const ProblemPage = () => {
             </div>
           </div>
           {/* Right Side Code Part */}
-          <div className="card bg-base-200 shadow-xl rounded-t-lg">
+          <div className="card bg-base-200 shadow-xl rounded-t-lg col-span-10">
             <div className="">
               <div className="tabs tabs-bordered bg-base-200/80 rounded-t-lg">
                 <button className="tab tab-active gap-2">

@@ -675,3 +675,628 @@ class Main {
 }`,
   },
 };
+
+const longestSubstringWithoutRepeating = {
+  title: "Longest Substring Without Repeating Characters",
+
+  description:
+    "Given a string s, find the length of the longest substring without repeating characters.\n\nA substring is a contiguous sequence of characters within a string.",
+
+  difficulty: "MEDIUM",
+
+  tags: ["String", "Sliding Window", "HashMap"],
+
+  constraints:
+    "0 <= s.length <= 10^5\ns consists of English letters, digits, symbols and spaces.",
+
+  hints:
+    "Use a sliding window with a set or hashmap to track characters. Expand the window and shrink it when duplicates appear.",
+
+  editorial:
+    "We use a sliding window with two pointers (left and right). We expand the window by moving right. If a duplicate character is found, we shrink the window from the left until the duplicate is removed. Track the maximum window size during the process.",
+
+  testCases: [
+    {
+      input: "abcabcbb",
+      output: "3",
+    },
+    {
+      input: "bbbbb",
+      output: "1",
+    },
+    {
+      input: "pwwkew",
+      output: "3",
+    },
+  ],
+
+  examples: {
+    JAVASCRIPT: {
+      input: 's = "abcabcbb"',
+      output: "3",
+      explanation:
+        "The answer is 'abc', with length 3.",
+    },
+    PYTHON: {
+      input: 's = "bbbbb"',
+      output: "1",
+      explanation:
+        "The answer is 'b', with length 1.",
+    },
+    JAVA: {
+      input: 's = "pwwkew"',
+      output: "3",
+      explanation:
+        "The answer is 'wke', with length 3.",
+    },
+  },
+
+  codeSnippets: {
+    JAVASCRIPT: `function lengthOfLongestSubstring(s) {
+  // Write your code here
+}
+
+// Input handling
+const readline = require('readline');
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  terminal: false
+});
+
+let inputData = [];
+
+rl.on('line', (line) => {
+  inputData.push(line.trim());
+});
+
+rl.on('close', () => {
+  const s = inputData[0];
+
+  const result = lengthOfLongestSubstring(s);
+  console.log(result);
+});`,
+
+    PYTHON: `class Solution:
+    def lengthOfLongestSubstring(self, s):
+        # Write your code here
+        pass
+
+if __name__ == "__main__":
+    import sys
+
+    s = sys.stdin.readline().strip()
+
+    sol = Solution()
+    result = sol.lengthOfLongestSubstring(s)
+
+    print(result)`,
+
+    JAVA: `import java.util.*;
+
+class Main {
+    public int lengthOfLongestSubstring(String s) {
+        // Write your code here
+        return 0;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        String s = sc.nextLine();
+
+        Main obj = new Main();
+        int result = obj.lengthOfLongestSubstring(s);
+
+        System.out.println(result);
+
+        sc.close();
+    }
+}`,
+  },
+
+  referenceSolutions: {
+    JAVASCRIPT: `function lengthOfLongestSubstring(s) {
+  let set = new Set();
+  let left = 0;
+  let maxLength = 0;
+
+  for (let right = 0; right < s.length; right++) {
+    while (set.has(s[right])) {
+      set.delete(s[left]);
+      left++;
+    }
+
+    set.add(s[right]);
+    maxLength = Math.max(maxLength, right - left + 1);
+  }
+
+  return maxLength;
+}
+
+// Input handling
+const readline = require('readline');
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  terminal: false
+});
+
+let inputData = [];
+
+rl.on('line', (line) => {
+  inputData.push(line.trim());
+});
+
+rl.on('close', () => {
+  const s = inputData[0];
+
+  const result = lengthOfLongestSubstring(s);
+  console.log(result);
+});`,
+
+    PYTHON: `class Solution:
+    def lengthOfLongestSubstring(self, s):
+        char_set = set()
+        left = 0
+        max_length = 0
+
+        for right in range(len(s)):
+            while s[right] in char_set:
+                char_set.remove(s[left])
+                left += 1
+
+            char_set.add(s[right])
+            max_length = max(max_length, right - left + 1)
+
+        return max_length
+
+if __name__ == "__main__":
+    import sys
+
+    s = sys.stdin.readline().strip()
+
+    sol = Solution()
+    result = sol.lengthOfLongestSubstring(s)
+
+    print(result)`,
+
+    JAVA: `import java.util.*;
+
+class Main {
+    public int lengthOfLongestSubstring(String s) {
+        Set<Character> set = new HashSet<>();
+        int left = 0;
+        int maxLength = 0;
+
+        for (int right = 0; right < s.length(); right++) {
+            while (set.contains(s.charAt(right))) {
+                set.remove(s.charAt(left));
+                left++;
+            }
+
+            set.add(s.charAt(right));
+            maxLength = Math.max(maxLength, right - left + 1);
+        }
+
+        return maxLength;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        String s = sc.nextLine();
+
+        Main obj = new Main();
+        int result = obj.lengthOfLongestSubstring(s);
+
+        System.out.println(result);
+
+        sc.close();
+    }
+}`,
+  },
+};
+
+const subarraySumEqualsK = {
+  title: "Subarray Sum Equals K",
+
+  description:
+    "Given an array of integers nums and an integer k, return the total number of continuous subarrays whose sum equals to k.",
+
+  difficulty: "MEDIUM",
+
+  tags: ["Array", "Prefix Sum", "HashMap"],
+
+  constraints:
+    "1 <= nums.length <= 2 * 10^4\n-1000 <= nums[i] <= 1000\n-10^7 <= k <= 10^7",
+
+  hints:
+    "Use prefix sum and a hashmap to store frequencies of sums.",
+
+  editorial:
+    "We use a running sum and store how many times a particular prefix sum has occurred. If (currentSum - k) exists in the map, it means a subarray with sum k exists.",
+
+  testCases: [
+    {
+      input: "1 1 1\n2",
+      output: "2",
+    },
+    {
+      input: "1 2 3\n3",
+      output: "2",
+    },
+    {
+      input: "-1 -1 1\n0",
+      output: "1",
+    },
+  ],
+
+  examples: {
+    JAVASCRIPT: {
+      input: "nums = [1,1,1], k = 2",
+      output: "2",
+      explanation:
+        "Subarrays are [1,1] and [1,1].",
+    },
+    PYTHON: {
+      input: "nums = [1,2,3], k = 3",
+      output: "2",
+      explanation:
+        "Subarrays are [1,2] and [3].",
+    },
+    JAVA: {
+      input: "nums = [-1,-1,1], k = 0",
+      output: "1",
+      explanation:
+        "Subarray is [-1,-1,1].",
+    },
+  },
+
+  codeSnippets: {
+    JAVASCRIPT: `function subarraySum(nums, k) {
+  // Write your code here
+}
+
+const readline = require('readline');
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
+let inputData = [];
+rl.on('line', (line) => inputData.push(line.trim()));
+
+rl.on('close', () => {
+  const nums = inputData[0].split(" ").map(Number);
+  const k = parseInt(inputData[1]);
+
+  const result = subarraySum(nums, k);
+  console.log(result);
+});`,
+
+    PYTHON: `class Solution:
+    def subarraySum(self, nums, k):
+        # Write your code here
+        pass
+
+if __name__ == "__main__":
+    import sys
+    lines = sys.stdin.read().splitlines()
+
+    nums = list(map(int, lines[0].split()))
+    k = int(lines[1])
+
+    sol = Solution()
+    print(sol.subarraySum(nums, k))`,
+
+    JAVA: `import java.util.*;
+
+class Main {
+    public int subarraySum(int[] nums, int k) {
+        // Write your code here
+        return 0;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        String[] arr = sc.nextLine().split(" ");
+        int[] nums = new int[arr.length];
+        for (int i = 0; i < arr.length; i++) nums[i] = Integer.parseInt(arr[i]);
+
+        int k = Integer.parseInt(sc.nextLine());
+
+        Main obj = new Main();
+        System.out.println(obj.subarraySum(nums, k));
+
+        sc.close();
+    }
+}`,
+  },
+
+  referenceSolutions: {
+    JAVASCRIPT: `function subarraySum(nums, k) {
+  let map = new Map();
+  map.set(0, 1);
+
+  let sum = 0;
+  let count = 0;
+
+  for (let num of nums) {
+    sum += num;
+
+    if (map.has(sum - k)) {
+      count += map.get(sum - k);
+    }
+
+    map.set(sum, (map.get(sum) || 0) + 1);
+  }
+
+  return count;
+}
+
+const readline = require('readline');
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
+let inputData = [];
+rl.on('line', (line) => inputData.push(line.trim()));
+
+rl.on('close', () => {
+  const nums = inputData[0].split(" ").map(Number);
+  const k = parseInt(inputData[1]);
+
+  const result = subarraySum(nums, k);
+  console.log(result);
+});`,
+
+    PYTHON: `class Solution:
+    def subarraySum(self, nums, k):
+        prefix = {0:1}
+        curr = 0
+        count = 0
+
+        for num in nums:
+            curr += num
+            if curr - k in prefix:
+                count += prefix[curr - k]
+            prefix[curr] = prefix.get(curr, 0) + 1
+
+        return count
+
+if __name__ == "__main__":
+    import sys
+    lines = sys.stdin.read().splitlines()
+
+    nums = list(map(int, lines[0].split()))
+    k = int(lines[1])
+
+    sol = Solution()
+    print(sol.subarraySum(nums, k))`,
+
+    JAVA: `import java.util.*;
+
+class Main {
+    public int subarraySum(int[] nums, int k) {
+        Map<Integer, Integer> map = new HashMap<>();
+        map.put(0, 1);
+
+        int sum = 0, count = 0;
+
+        for (int num : nums) {
+            sum += num;
+
+            if (map.containsKey(sum - k)) {
+                count += map.get(sum - k);
+            }
+
+            map.put(sum, map.getOrDefault(sum, 0) + 1);
+        }
+
+        return count;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        String[] arr = sc.nextLine().split(" ");
+        int[] nums = new int[arr.length];
+        for (int i = 0; i < arr.length; i++) nums[i] = Integer.parseInt(arr[i]);
+
+        int k = Integer.parseInt(sc.nextLine());
+
+        Main obj = new Main();
+        System.out.println(obj.subarraySum(nums, k));
+
+        sc.close();
+    }
+}`,
+  },
+};
+
+const containerWithMostWater = {
+  title: "Container With Most Water",
+
+  description:
+    "Given an integer array height, find two lines that together with the x-axis form a container, such that the container contains the most water.",
+
+  difficulty: "MEDIUM",
+
+  tags: ["Array", "Two Pointers"],
+
+  constraints:
+    "2 <= height.length <= 10^5\n0 <= height[i] <= 10^4",
+
+  hints:
+    "Use two pointers from both ends and move the smaller height inward.",
+
+  editorial:
+    "We use two pointers. The area is determined by the shorter line. Move the pointer pointing to the smaller height to maximize area.",
+
+  testCases: [
+    {
+      input: "1 8 6 2 5 4 8 3 7",
+      output: "49",
+    },
+    {
+      input: "1 1",
+      output: "1",
+    },
+  ],
+
+  examples: {
+    JAVASCRIPT: {
+      input: "height = [1,8,6,2,5,4,8,3,7]",
+      output: "49",
+      explanation:
+        "Max area between heights 8 and 7.",
+    },
+    PYTHON: {
+      input: "height = [1,1]",
+      output: "1",
+      explanation:
+        "Only one possible container.",
+    },
+    JAVA: {
+      input: "height = [1,8,6,2,5]",
+      output: "8",
+      explanation:
+        "Max area is 8.",
+    },
+  },
+
+  codeSnippets: {
+    JAVASCRIPT: `function maxArea(height) {
+  // Write your code here
+}
+
+const readline = require('readline');
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
+let inputData = [];
+rl.on('line', (line) => inputData.push(line.trim()));
+
+rl.on('close', () => {
+  const height = inputData[0].split(" ").map(Number);
+
+  const result = maxArea(height);
+  console.log(result);
+});`,
+
+    PYTHON: `class Solution:
+    def maxArea(self, height):
+        # Write your code here
+        pass
+
+if __name__ == "__main__":
+    import sys
+    height = list(map(int, sys.stdin.readline().split()))
+
+    sol = Solution()
+    print(sol.maxArea(height))`,
+
+    JAVA: `import java.util.*;
+
+class Main {
+    public int maxArea(int[] height) {
+        // Write your code here
+        return 0;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        String[] arr = sc.nextLine().split(" ");
+        int[] height = new int[arr.length];
+        for (int i = 0; i < arr.length; i++) height[i] = Integer.parseInt(arr[i]);
+
+        Main obj = new Main();
+        System.out.println(obj.maxArea(height));
+
+        sc.close();
+    }
+}`,
+  },
+
+  referenceSolutions: {
+    JAVASCRIPT: `function maxArea(height) {
+  let left = 0, right = height.length - 1;
+  let max = 0;
+
+  while (left < right) {
+    const area = Math.min(height[left], height[right]) * (right - left);
+    max = Math.max(max, area);
+
+    if (height[left] < height[right]) left++;
+    else right--;
+  }
+
+  return max;
+}
+
+const readline = require('readline');
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
+let inputData = [];
+rl.on('line', (line) => inputData.push(line.trim()));
+
+rl.on('close', () => {
+  const height = inputData[0].split(" ").map(Number);
+
+  const result = maxArea(height);
+  console.log(result);
+});`,
+
+    PYTHON: `class Solution:
+    def maxArea(self, height):
+        left, right = 0, len(height) - 1
+        max_area = 0
+
+        while left < right:
+            area = min(height[left], height[right]) * (right - left)
+            max_area = max(max_area, area)
+
+            if height[left] < height[right]:
+                left += 1
+            else:
+                right -= 1
+
+        return max_area
+
+if __name__ == "__main__":
+    import sys
+    height = list(map(int, sys.stdin.readline().split()))
+
+    sol = Solution()
+    print(sol.maxArea(height))`,
+
+    JAVA: `import java.util.*;
+
+class Main {
+    public int maxArea(int[] height) {
+        int left = 0, right = height.length - 1;
+        int max = 0;
+
+        while (left < right) {
+            int area = Math.min(height[left], height[right]) * (right - left);
+            max = Math.max(max, area);
+
+            if (height[left] < height[right]) left++;
+            else right--;
+        }
+
+        return max;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        String[] arr = sc.nextLine().split(" ");
+        int[] height = new int[arr.length];
+        for (int i = 0; i < arr.length; i++) height[i] = Integer.parseInt(arr[i]);
+
+        Main obj = new Main();
+        System.out.println(obj.maxArea(height));
+
+        sc.close();
+    }
+}`,
+  },
+};
