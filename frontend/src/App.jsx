@@ -18,6 +18,7 @@ import AdminRoute from './components/AdminRoute.jsx';
 import { useThemeStore } from './store/useThemeStore.js';
 import { useAuthStore } from './store/useAuthStore.js';
 import { Loader2 } from 'lucide-react';
+import EmailVerificationPage from './pages/EmailVerificationPage.jsx';
 
 const App = () => {
   const {authUser, isCheckingAuth, checkAuth} = useAuthStore();
@@ -57,6 +58,7 @@ const App = () => {
             <Route path="add-problem" element={authUser ? <AddProblem/>: <Navigate to="/login" />}/>
           </Route>
           <Route path="/problem/:id" element={authUser ? <ProblemPage /> : <Navigate to="/login" />} />
+          <Route path="/verify-email/:token" element={ <EmailVerificationPage/>} />
           
           <Route path="*" element={<PageNotFound />} />
         </Routes>

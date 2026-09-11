@@ -13,7 +13,7 @@ const sendVerificationEmail = async (email, token) => {
             }
         });
         //Verification URL
-        const verificationUrl = `${process.env.BASE_URL}/api/v1/auth/verify/${token}`;
+        const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${token}`;
         //Email content
         const mailOptions = {
             from: `"CodeLab" <support.codelab@gmail.com>`,

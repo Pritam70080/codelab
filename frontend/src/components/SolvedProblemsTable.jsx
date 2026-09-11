@@ -49,7 +49,7 @@ const SolvedProblemsTable = ({ problems = [], isLoading }) => {
           <ListChecks className="size-5 text-primary" />
         <span className="font-semibold text-md text-base-content px-4 bg-primary/30 rounded-lg">Recent AC</span>
         </div>
-        <Link to="/submissions" className="hover:link text-xs text-base-content">View all Submissions</Link>
+        <Link to="/submissions" className="btn btn-sm btn-secondary ">View all Submissions</Link>
       </div>
 
       {/* Table */}

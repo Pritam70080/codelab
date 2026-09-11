@@ -9,7 +9,7 @@ export const register = async (req, res) => {
     try {
         const { name, email, password } = req.body;
         if (!name || !email || !password) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "All fields are required !",
                 success: false
             })
@@ -45,13 +45,13 @@ export const register = async (req, res) => {
         }
         const sentMail = await sendVerificationEmail(email, verificationToken);
         if (!sentMail) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Error in sending mail",
                 success: false
             })
         }
         return res.status(201).json({
-            message: "User created successfully",
+            message: "Please verify your email address to complete your registration.",
             success: true,
             user: {
                 id: newUser.id,
@@ -75,25 +75,56 @@ export const register = async (req, res) => {
 export const verifyEmail = async (req, res) => {
     try {
         const { token } = req.params;
+
         if (!token) {
             return res.status(400).json({
-                message: "No token provided",
+                message: "Verification token is required",
                 success: false
             });
         }
-        const decoded = await jwt.verify(token, process.env.VERIFICATION_SECRET);
+
+        let decoded;
+
+        try {
+            decoded = jwt.verify(
+                token,
+                process.env.VERIFICATION_SECRET
+            );
+        } catch (error) {
+            if (error.name === "TokenExpiredError") {
+                return res.status(400).json({
+                    message: "Verification link has expired",
+                    success: false
+                });
+            }
+
+            return res.status(400).json({
+                message: "Invalid verification token",
+                success: false
+            });
+        }
+
         const user = await db.user.findUnique({
             where: {
                 email: decoded.id,
                 verificationToken: token
             }
         });
+
         if (!user) {
             return res.status(404).json({
-                message: "User not found",
+                message: "Invalid or already used verification link",
                 success: false
             });
         }
+
+        if (user.isVerified) {
+            return res.status(400).json({
+                message: "Email is already verified",
+                success: false
+            });
+        }
+
         await db.user.update({
             where: {
                 id: user.id
@@ -103,18 +134,21 @@ export const verifyEmail = async (req, res) => {
                 isVerified: true
             }
         });
+
         return res.status(200).json({
-            message: "User verified successfully",
+            message: "Email verified successfully",
             success: true
         });
+
     } catch (error) {
         console.error("Error verifying user", error);
+
         return res.status(500).json({
-            message: "Token expired",
+            message: "Internal server error",
             success: false
         });
     }
-}
+};
 
 export const login = async (req, res) => {
     try {

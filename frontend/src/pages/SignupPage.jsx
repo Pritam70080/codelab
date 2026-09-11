@@ -52,7 +52,7 @@ const SignupPage = () => {
       className="min-h-screen pt-20"
     >
       <section className="grid lg:grid-cols-2">
-        <div className="px-6 md:px-12 pt-2 pb-4 md:shadow-lg rounded-xl">
+        <div className="px-6 md:px-12 pb-4 md:shadow-lg rounded-xl">
           {/* Logo */}
           <div className="flex flex-col justify-center items-center">
             <div className="rounded-xl bg-primary/10 hover:bg-primary/20 p-2">

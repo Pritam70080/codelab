@@ -6,7 +6,7 @@ import { isLoggedin } from "../middlewares/auth.middleware.js";
 const authRouter = express.Router();
 
 authRouter.post("/register", register);
-authRouter.get("/verify/:token", verifyEmail);
+authRouter.get("/verify-email/:token", verifyEmail);
 authRouter.post("/login", login);
 authRouter.get("/get-profile", isLoggedin, getProfile);
 authRouter.get("/logout", isLoggedin, logout);

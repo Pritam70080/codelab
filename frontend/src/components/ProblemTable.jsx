@@ -121,13 +121,13 @@ const ProblemTable = ({ problems }) => {
                         {(problem.tags || []).map((tag, idx) => (
                           <span
                             key={idx}
-                            className={`badge badge-outline ${theme === "lemonade" ? "badge-primary" : "badge-warning"} text-xs font-bold`}
+                            className={`badge badge-outline text-xs font-bold`}
                           >
                             {tag}
                           </span>
                         ))}
                       </div></td>
-                      <td ><span className={`badge text-xs text-white font-semibold ${problem.difficulty === "EASY" ? "badge-success" : problem.difficulty === "MEDIUM" ? "badge-warning" : "badge-error"}`}>{problem.difficulty.charAt(0).toUpperCase() + problem.difficulty.slice(1).toLowerCase()}</span></td>
+                      <td ><span className={`badge text-xs text-base-700 font-semibold  ${problem.difficulty === "EASY" ? "badge-success" : problem.difficulty === "MEDIUM" ? "badge-warning" : "badge-error"}`}>{problem.difficulty.charAt(0).toUpperCase() + problem.difficulty.slice(1).toLowerCase()}</span></td>
                       <td>
                         <div className="flex flex-col md:flex-row md:items-center gap-4">
                           {authUser.role === "ADMIN" &&

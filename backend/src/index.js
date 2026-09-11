@@ -12,9 +12,9 @@ const app = express();
 app.use(express.json());
 app.use(urlencoded({extended: true}));
 app.use(cors({
-    origin: ["http://localhost:5173", process.env.BASE_URL],
+    origin: [process.env.FRONTEND_URL, process.env.BASE_URL],
     allowedHeaders: ["Content-Type", "Authorization"],
-    methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS"],
+    methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
     credentials: true
 }));
 app.use(cookieParser());

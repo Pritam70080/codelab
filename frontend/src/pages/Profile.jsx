@@ -87,7 +87,7 @@ const Profile = () => {
           </div>
           {/* Submissions */}
           <div className="overflow-x-hidden p-4">
-            <SolvedProblemsTable problems={solvedProblems} isLoading={isProblemsLoading} />
+            <SolvedProblemsTable problems={solvedProblems.slice(0, 2)} isLoading={isProblemsLoading} />
           </div>
         </main>
       </section>

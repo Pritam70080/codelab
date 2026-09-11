@@ -59,7 +59,9 @@ const Navbar = () => {
           <nav>
             <ul className="hidden md:flex gap-6">
               {navItems.map(({ id, path, label }) => {
-                return <li key={id}><NavLink to={path} className={({ isActive }) => `${isActive ? "text-primary" : ""} hover:text-primary`}>{label}</NavLink></li>
+                return (<li key={id}>
+                  <NavLink to={path} className={({ isActive }) => `${isActive ? "text-primary" : ""} hover:text-primary`}>{label}</NavLink>
+                  </li>)
               })}
             </ul>
           </nav>
