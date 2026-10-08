@@ -3,7 +3,9 @@ import jwt from "jsonwebtoken";
 
 import { db } from "../libs/db.js";
 import sendVerificationEmail from "../libs/sendMail.js";
+import { deleteFromCloudinary, uploadToCloudinary } from "../libs/cloudinary.js";
 import { UserRole } from "../generated/prisma/enums.ts";
+import { unlink } from "node:fs/promises";
 
 export const register = async (req, res) => {
     try {
@@ -57,7 +59,7 @@ export const register = async (req, res) => {
                 id: newUser.id,
                 name: newUser.name,
                 email: newUser.email,
-                image: newUser.email,
+                image: newUser.imageUrl,
                 role: newUser.role
             }
         });
@@ -171,14 +173,14 @@ export const login = async (req, res) => {
             })
         }
         if(!user.isVerified) {
-            return res.status(400).json({
+            return res.status(409).json({
                 message: "User account is not verified",
                 success: false
             })
         }
         const isMatched = await bcrypt.compare(password, user.password);
         if(!isMatched) {
-            return res.status(401).json({
+            return res.status(400).json({
                 message: "Incorrect email or password",
                 success: false
             })
@@ -212,7 +214,7 @@ export const login = async (req, res) => {
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                image: user.email,
+                image: user.imageUrl,
                 role: user.role
             }
         })
@@ -274,5 +276,115 @@ export const logout = async (req, res) => {
             message: "Internal server error",
             success: false
         })
+    }
+}
+
+export const updateProfile = async (req, res) => {
+    let uploadedImage;
+    let updateCommitted = false;
+
+    try {
+        const userId = req.user.id;
+        const body = req.body ?? {};
+        const { name, password } = body;
+        const existingUser = await db.user.findUnique({
+            where: {
+                id: userId
+            }
+        });
+        if (!existingUser) {
+            return res.status(404).json({
+                message: "User not found",
+                success: false
+            });
+        }
+
+        const hasName = Object.prototype.hasOwnProperty.call(body, "name");
+        const hasPassword = Object.prototype.hasOwnProperty.call(body, "password");
+
+        if (!hasName && !hasPassword && !req.file) {
+            return res.status(400).json({
+                message: "At least one profile field must be provided",
+                success: false
+            });
+        }
+
+        const data = {};
+
+        if (hasName) {
+            if (typeof name !== "string" || !name.trim()) {
+                return res.status(400).json({
+                    message: "Name must be a non-empty string",
+                    success: false
+                });
+            }
+            data.name = name.trim();
+        }
+
+        if (hasPassword) {
+            if (typeof password !== "string" || password.length === 0) {
+                return res.status(400).json({
+                    message: "Password must be a non-empty string",
+                    success: false
+                });
+            }
+            data.password = await bcrypt.hash(password, 10);
+        }
+
+        if (req.file) {
+            uploadedImage = await uploadToCloudinary(req.file.path);
+            data.imageUrl = uploadedImage.secure_url;
+            data.imagePublicId = uploadedImage.public_id;
+        }
+
+        const updatedUser = await db.user.update({
+            where: { id: userId },
+            data
+        });
+        updateCommitted = true;
+
+        if (uploadedImage && existingUser.imagePublicId) {
+            try {
+                await deleteFromCloudinary(existingUser.imagePublicId);
+            } catch (error) {
+                console.error("Error deleting previous profile image from Cloudinary", error);
+            }
+        }
+
+        return res.status(200).json({
+            message: "User profile updated successfully",
+            success: true,
+            user: {
+                id: updatedUser.id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                image: updatedUser.imageUrl,
+                role: updatedUser.role
+            }
+        });
+    } catch (error) {
+        if (uploadedImage && !updateCommitted) {
+            try {
+                await deleteFromCloudinary(uploadedImage.public_id);
+            } catch (cleanupError) {
+                console.error("Error cleaning up uploaded profile image", cleanupError);
+            }
+        }
+
+        console.error("Error updating user profile", error);
+        return res.status(500).json({
+            message: "Internal server error",
+            success: false
+        })
+    } finally {
+        if (req.file?.path) {
+            try {
+                await unlink(req.file.path);
+            } catch (error) {
+                if (error.code !== "ENOENT") {
+                    console.error("Error removing temporary profile image", error);
+                }
+            }
+        }
     }
 }

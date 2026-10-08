@@ -21,7 +21,7 @@ export const isLoggedin = async (req, res, next) => {
                     select: {
                         id: true,
                         name: true,
-                        image: true,
+                        imageUrl: true,
                         email: true,
                         role: true
                     }
@@ -29,7 +29,7 @@ export const isLoggedin = async (req, res, next) => {
                 if (!user) {
                     throw new Error("User not found");
                 }
-                req.user = user;
+                req.user = {...user, image: user.imageUrl};
                 return next();
             } catch (error) {
                 console.log("Access Token is expired", error);
@@ -49,7 +49,7 @@ export const isLoggedin = async (req, res, next) => {
             select: {
                 id: true,
                 name: true,
-                image: true,
+                imageUrl: true,
                 email: true,
                 role: true
             }
@@ -73,17 +73,17 @@ export const isLoggedin = async (req, res, next) => {
             });
         res.cookie("accessToken", newAccessToken, {
             httpOnly: true,
-            ssecure: true,
+            secure: true,
             sameSite: "none",
             maxAge: 15 * 60 * 1000
         });
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            ssecure: true,
+            secure: true,
             sameSite: "none",
             maxAge: 24 * 60 * 60 * 1000
         });
-        req.user = user;
+        req.user = {...user, image: user.imageUrl};
         return next();
     } catch (error) {
         console.error("Error validating tokens", error);

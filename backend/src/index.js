@@ -28,6 +28,9 @@ app.use("/api/v1/problems", problemRouter);
 app.use("/api/v1/execute-code", executionRouter);
 app.use("/api/v1/submission", submissionRouter);
 app.use("/api/v1/playlist", playlistRouter);
+app.use((req, res) => {
+    res.status(404).json({ message: "Route not found", success: false });
+})
 
 
 const PORT = process.env.PORT || 8080;

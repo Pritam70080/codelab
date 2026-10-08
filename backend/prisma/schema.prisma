@@ -28,7 +28,8 @@ model User {
   id                String   @id @default(uuid())
   name              String?
   email             String   @unique
-  image             String?
+  imageUrl          String?
+  imagePublicId     String?
   role              UserRole @default(USER)
   password          String
   verificationToken String?
@@ -65,9 +66,9 @@ model Problem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  submissions      Submission[] //for the problem all the submissions
-  solvedBy         ProblemSolved[] //for the problem those who solved it successfully
-  inPlaylist ProblemsInPlaylist[]
+  submissions Submission[] //for the problem all the submissions
+  solvedBy    ProblemSolved[] //for the problem those who solved it successfully
+  inPlaylist  ProblemsInPlaylist[]
 
   //relationships
   user User @relation(fields: [userId], references: [id], onDelete: Cascade) //relation with user who created this problem
@@ -135,7 +136,7 @@ model ProblemSolved {
 }
 
 model Playlist {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   name        String
   description String?
   userId      String
