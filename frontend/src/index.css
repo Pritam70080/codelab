@@ -4,7 +4,7 @@
 }
 
 *::selection {
-  @apply bg-primary text-black;
+  @apply bg-primary text-base-content;
 }
 
 @theme {

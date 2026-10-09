@@ -1,98 +1,193 @@
-import React, { useEffect } from 'react'
-import { motion } from "motion/react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
-import { pageTransition } from '../lib/pageTransition.js';
-import { ChevronLeft, LogOut } from 'lucide-react';
-import { useAuthStore } from '../store/useAuthStore.js';
-import LogoutButton from '../components/LogoutButton.jsx';
-import SolvedProblemsTable from '../components/SolvedProblemsTable.jsx';
-import { useProblemStore } from '../store/useProblemStore.js';
-import ProfileStats from '../components/ProfileStats.jsx';
-import ContributionHeatmap from '../components/ContributionHeatMap.jsx';
-import { useThemeStore } from '../store/useThemeStore.js';
+import ContributionHeatmap from "../components/ContributionHeatmap.jsx";
+import ProfileStats from "../components/ProfileStats.jsx";
+import SheetCards from "../components/SheetCards.jsx";
+import SolvedProblemsTable from "../components/SolvedProblemsTable.jsx";
+import SubmissionsList from "../components/SubmissionsList.jsx";
+import { useAuthStore } from "../store/useAuthStore.js";
+import { useProblemStore } from "../store/useProblemStore.js";
+import { useSheetStore } from "../store/useSheetStore.js";
+import { useSubmissionStore } from "../store/useSubmissionStore.js";
+import { useThemeStore } from "../store/useThemeStore.js";
+
+const difficultyColors = {
+  Easy: "#22c55e",
+  Medium: "#f59e0b",
+  Hard: "#ef4444",
+};
 
 const Profile = () => {
   const { authUser } = useAuthStore();
   const { solvedProblems, isProblemsLoading, getSolvedProblems } = useProblemStore();
-  const {theme} = useThemeStore();
+  const { submissions, isSubmissionLoading, getAllSubmissions } = useSubmissionStore();
+  const { sheets, isLoadingSheets, getSheets } = useSheetStore();
+  const { theme } = useThemeStore();
 
   useEffect(() => {
     getSolvedProblems();
-  }, []);
+    getAllSubmissions();
+    getSheets({ mine: authUser.role === "ADMIN" });
+  }, [authUser.role, getSolvedProblems, getAllSubmissions, getSheets]);
 
+  const recentSubmissions = [...submissions]
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 5);
+  const recentSolvedProblems = [...solvedProblems]
+    .sort((a, b) => new Date(b.solvedBy?.[0]?.createdAt ?? b.updatedAt) - new Date(a.solvedBy?.[0]?.createdAt ?? a.updatedAt))
+    .slice(0, 5);
 
+  const difficultyData = ["Easy", "Medium", "Hard"].map((difficulty) => ({
+    difficulty,
+    solved: solvedProblems.filter((problem) => problem.difficulty === difficulty.toUpperCase()).length,
+  }));
+
+  const now = new Date();
+  const submissionActivity = Array.from({ length: 6 }, (_, index) => {
+    const month = new Date(now.getFullYear(), now.getMonth() - 5 + index, 1);
+    const monthSubmissions = submissions.filter((submission) => {
+      const createdAt = new Date(submission.createdAt);
+      return createdAt.getFullYear() === month.getFullYear() && createdAt.getMonth() === month.getMonth();
+    });
+    return {
+      month: month.toLocaleString(undefined, { month: "short" }),
+      submissions: monthSubmissions.length,
+      accepted: monthSubmissions.filter((submission) => submission.status === "Accepted").length,
+    };
+  });
 
   return (
-    <motion.div
-      variants={pageTransition}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
+    <div className="space-y-6">
+      <header className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary">Your workspace</p>
+          <h1 className="mt-1 text-3xl font-bold">Profile overview</h1>
+          <p className="mt-1 text-sm text-base-content/65">Your problem-solving activity and progress in one place.</p>
+        </div>
+        <Link to="/problems" className="btn btn-primary btn-sm">Solve a problem</Link>
+      </header>
 
-      className="min-h-screen pt-5"
-    >
-      <section className="grid grid-cols-1 md:grid-cols-12 gap-0.5 px-4 md:px-2">
-        <aside className="col-span-4 lg:col-span-3 card md:h-full p-2 gap-2">
-          <div className="flex mb-4 items-center ">
-            <Link to="/problems" className="btn btn-sm btn-ghost">
-              <ChevronLeft className="size-6" />
-            </Link>
-          </div>
-          {/* Profile Image */}
-          <div className="px-6">
-            <div className="border-5 border-primary/80 rounded-full md:rounded-sm size-25 flex justify-center items-center bg-primary/10 hover:bg-primary/15">
-              {authUser.image ? <img src={authUser.image} alt="User Profile" className="avatar" /> :
-                <div className="text-5xl font-bold ">{authUser.name.charAt(0).toUpperCase()}</div>
-              }</div>
-          </div>
-          {/* Profile Details */}
-          <div className="card-body">
-            <div className="flex items-center gap-3.5">
-              <h1 className="card-title">{authUser.name}</h1>
-              {authUser.role === "ADMIN" && <span className="badge badge-sm badge-primary">Admin</span>}
-            </div>
-            <h2 className="text-md text-base-content/70 ">{authUser.email}</h2>
-            <Link to="/profile/edit" className="w-full">
-              <button className="btn btn-primary btn-outline btn-sm mt-1.5 w-full">Edit Profile</button>
-            </Link>
-            <LogoutButton className="mt-4" >
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </LogoutButton>
-          </div>
+      <ProfileStats
+        problems={solvedProblems}
+        submissions={submissions}
+        sheets={sheets}
+        isLoading={isProblemsLoading || isSubmissionLoading || isLoadingSheets}
+      />
 
-        </aside>
-        <main className="col-span-9 card pt-4">
-          {/* Analytics */}
-          <div className="p-4 grid md:grid-cols-3 gap-4">
-            {/* Stats */}
-            <div className="col-span-1">
-              <ProfileStats problems={solvedProblems} isLoading={isProblemsLoading} />
-            </div>
-
+      <section className="card border border-base-300/70 bg-base-100 p-4 sm:p-5">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold">Activity</h2>
+            <p className="text-sm text-base-content/60">Your solved problems over the past year</p>
           </div>
-          {/* Heatmap */}
-          <div className="w-full card px-3">
-            <h2 className="font-semibold mb-2">Activity</h2>
-            <ContributionHeatmap problems={solvedProblems} />
-            <div className="flex items-center gap-2 mt-2 text-xs">
-              <span>Less</span>
-              <div className={`w-3 h-3 ${theme === "dark" || theme === "dim" ? "bg-gray-600" : "bg-base-300"}`}></div>
-              <div className="w-3 h-3 bg-green-300"></div>
-              <div className="w-3 h-3 bg-green-500"></div>
-              <div className="w-3 h-3 bg-green-700"></div>
-              <span>More</span>
-            </div>
-          </div>
-          {/* Submissions */}
-          <div className="overflow-x-hidden p-4">
-            <SolvedProblemsTable problems={solvedProblems.slice(0, 2)} isLoading={isProblemsLoading} />
-          </div>
-        </main>
+          <span className="badge badge-outline">{solvedProblems.length} solved</span>
+        </div>
+        <ContributionHeatmap problems={solvedProblems} />
+        <div className="mt-3 flex items-center justify-end gap-2 text-xs text-base-content/60">
+          <span>Less</span>
+          <div className={`size-3 rounded-sm ${theme === "dark" || theme === "dim" ? "bg-gray-600" : "bg-base-300"}`} />
+          <div className="size-3 rounded-sm bg-green-300" />
+          <div className="size-3 rounded-sm bg-green-500" />
+          <div className="size-3 rounded-sm bg-green-700" />
+          <span>More</span>
+        </div>
       </section>
-    </motion.div>
-  )
-}
 
-export default Profile
+      <section className="grid gap-4 xl:grid-cols-2">
+        <div className="card min-w-0 border border-base-300/70 bg-base-100 p-4 sm:p-5">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold">Solved by difficulty</h2>
+            <p className="text-sm text-base-content/60">Breakdown of your completed problems</p>
+          </div>
+          <div className="h-64 min-w-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={difficultyData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-base-300)" />
+                <XAxis dataKey="difficulty" tick={{ fill: "var(--color-base-content)", fontSize: 12 }} axisLine={false} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fill: "var(--color-base-content)", fontSize: 12 }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: "var(--color-base-100)", borderColor: "var(--color-base-300)", borderRadius: 12 }}
+                  labelStyle={{ color: "var(--color-base-content)" }}
+                />
+                <Bar dataKey="solved" name="Solved" radius={[6, 6, 0, 0]}>
+                  {difficultyData.map((entry) => <Cell key={entry.difficulty} fill={difficultyColors[entry.difficulty]} />)}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="card min-w-0 border border-base-300/70 bg-base-100 p-4 sm:p-5">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold">Submission activity</h2>
+            <p className="text-sm text-base-content/60">Attempts and accepted submissions over six months</p>
+          </div>
+          <div className="h-64 min-w-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={submissionActivity} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-base-300)" />
+                <XAxis dataKey="month" tick={{ fill: "var(--color-base-content)", fontSize: 12 }} axisLine={false} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fill: "var(--color-base-content)", fontSize: 12 }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: "var(--color-base-100)", borderColor: "var(--color-base-300)", borderRadius: 12 }}
+                  labelStyle={{ color: "var(--color-base-content)" }}
+                />
+                <Legend />
+                <Bar dataKey="submissions" name="Attempts" fill="#6366f1" radius={[5, 5, 0, 0]} />
+                <Bar dataKey="accepted" name="Accepted" fill="#22c55e" radius={[5, 5, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold">{authUser.role === "ADMIN" ? "Sheets you created" : "Your sheet progress"}</h2>
+            <p className="text-sm text-base-content/60">Keep track of the learning paths you are working through.</p>
+          </div>
+          <Link to="/sheets" className="link link-primary text-sm">Browse sheets</Link>
+        </div>
+        <SheetCards
+          sheets={sheets}
+          isLoading={isLoadingSheets}
+          emptyMessage={authUser.role === "ADMIN" ? "You have not created any sheets yet." : "No published sheets are available yet."}
+        />
+      </section>
+
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-lg font-semibold">Recently solved</h2>
+          <p className="text-sm text-base-content/60">The latest problems you completed</p>
+        </div>
+        <SolvedProblemsTable problems={recentSolvedProblems} isLoading={isProblemsLoading} />
+      </section>
+
+      <section className="space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold">Recent submissions</h2>
+            <p className="text-sm text-base-content/60">Your latest coding attempts</p>
+          </div>
+          <Link to="/submissions" className="link link-primary text-sm">View all</Link>
+        </div>
+        <SubmissionsList submissions={recentSubmissions} isLoading={isSubmissionLoading} />
+      </section>
+    </div>
+  );
+};
+
+export default Profile;

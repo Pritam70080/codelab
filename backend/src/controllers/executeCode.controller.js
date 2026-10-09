@@ -1,5 +1,6 @@
 import { getLanguageName, pollBatchResults, submitBatch } from "../libs/judge0.js";
 import {db} from "../libs/db.js";
+import { canAccessProblem } from "../libs/sheetAccess.js";
 
 export const executeCode = async (req, res) => {
     try {
@@ -96,7 +97,20 @@ export const submitCode = async (req, res) => {
                 message: "Invalid or Missing testcases."
             });
         }
-        //Prepare each test cases for judge0 batch submission
+        if (typeof problemId !== "string" || !problemId) {
+            return res.status(400).json({
+                success: false,
+                message: "A problem ID is required."
+            });
+        }
+        if (!(await canAccessProblem(problemId, req.user))) {
+            return res.status(403).json({
+                message: "Purchase the sheet to submit this problem",
+                success: false,
+                requiresPurchase: true
+            });
+        }
+        //Prepare each test cases for Judge0 batch submission
         const submissions = stdin.map((input) => ({
             source_code,
             language_id,

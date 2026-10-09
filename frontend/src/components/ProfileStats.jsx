@@ -1,58 +1,50 @@
-const ProfileStats = ({ problems = [], isLoading }) => {
+import { createElement } from "react";
+import { BookOpenCheck, CheckCircle2, Code2, Target } from "lucide-react";
+
+const ProfileStats = ({ problems = [], submissions = [], sheets = [], isLoading }) => {
+  const acceptedSubmissions = submissions.filter((submission) => submission.status === "Accepted").length;
+  const sheetTotals = sheets.reduce((totals, sheet) => ({
+    solved: totals.solved + (sheet.progress?.solved ?? 0),
+    total: totals.total + (sheet.progress?.total ?? sheet._count?.problems ?? 0),
+  }), { solved: 0, total: 0 });
+  const acceptanceRate = submissions.length
+    ? Math.round((acceptedSubmissions / submissions.length) * 100)
+    : 0;
+  const sheetProgress = sheetTotals.total
+    ? Math.round((sheetTotals.solved / sheetTotals.total) * 100)
+    : 0;
+
+  const stats = [
+    { label: "Problems solved", value: problems.length, icon: CheckCircle2, color: "text-success" },
+    { label: "Submissions", value: submissions.length, icon: Code2, color: "text-primary" },
+    { label: "Acceptance rate", value: `${acceptanceRate}%`, icon: Target, color: "text-secondary" },
+    { label: "Sheet progress", value: `${sheetProgress}%`, icon: BookOpenCheck, color: "text-warning" },
+  ];
+
   if (isLoading) {
     return (
-      <div className="grid grid-cols-3 gap-3 animate-pulse">
-        {[1, 2, 3].map((_, i) => (
-          <div
-            key={i}
-            className="card p-3 bg-base-200 h-16 flex flex-col justify-center items-center"
-          >
-            <div className="h-4 w-8 bg-base-300 rounded mb-2"></div>
-            <div className="h-3 w-12 bg-base-300 rounded"></div>
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {stats.map((stat) => (
+          <div key={stat.label} className="card h-28 animate-pulse border border-base-300/70 bg-base-100 p-4">
+            <div className="h-3 w-24 rounded bg-base-300" />
+            <div className="mt-4 h-7 w-16 rounded bg-base-300" />
           </div>
         ))}
-
-        <div className="card p-3 bg-base-200 col-span-3 h-16 flex flex-col justify-center items-center">
-          <div className="h-4 w-10 bg-base-300 rounded mb-2"></div>
-          <div className="h-3 w-16 bg-base-300 rounded"></div>
-        </div>
       </div>
     );
   }
 
-  const total = problems.length;
-
-  const easy = problems.filter(p => p.difficulty === "EASY").length;
-  const medium = problems.filter(p => p.difficulty === "MEDIUM").length;
-  const hard = problems.filter(p => p.difficulty === "HARD").length;
-
   return (
-    <div className="grid grid-cols-3 gap-3">
-
-      {/* Easy */}
-      <div className="card p-3 text-center bg-green-100 border border-green-500/30">
-        <p className="font-bold text-green-500 text-lg">{easy}</p>
-        <p className="text-xs text-black font-medium">Easy</p>
-      </div>
-
-      {/* Medium */}
-      <div className="card p-3 text-center bg-orange-100 border border-yellow-500/30">
-        <p className="font-bold text-yellow-500 text-lg">{medium}</p>
-        <p className="text-xs text-black font-medium">Medium</p>
-      </div>
-
-      {/* Hard */}
-      <div className="card p-3 text-center bg-red-100 border border-red-500/30">
-        <p className="font-bold text-red-500 text-lg">{hard}</p>
-        <p className="text-xs text-black font-medium">Hard</p>
-      </div>
-
-      {/* Total */}
-      <div className="card p-3 text-center border border-base-300/50 bg-base-200/50 col-span-3">
-        <p className="font-bold text-xl">{total}</p>
-        <p className="text-xs text-base-content/70 font-medium">Solved</p>
-      </div>
-
+    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      {stats.map((stat) => (
+        <article key={stat.label} className="card border border-base-300/70 bg-base-100 p-4 shadow-sm">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm text-base-content/65">{stat.label}</p>
+            {createElement(stat.icon, { className: `size-5 ${stat.color}` })}
+          </div>
+          <p className="mt-3 text-3xl font-bold tracking-tight">{stat.value}</p>
+        </article>
+      ))}
     </div>
   );
 };

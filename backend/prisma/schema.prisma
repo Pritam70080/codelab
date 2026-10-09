@@ -43,6 +43,9 @@ model User {
   problemSolved ProblemSolved[] //the problems that are successfully solved (Marked as done)
 
   playlists Playlist[]
+
+  sheetsCreated Sheet[]
+  sheetPurchases SheetPurchase[]
 }
 
 model Problem {
@@ -69,6 +72,8 @@ model Problem {
   submissions Submission[] //for the problem all the submissions
   solvedBy    ProblemSolved[] //for the problem those who solved it successfully
   inPlaylist  ProblemsInPlaylist[]
+
+  inSheets SheetProblem[]
 
   //relationships
   user User @relation(fields: [userId], references: [id], onDelete: Cascade) //relation with user who created this problem
@@ -163,4 +168,68 @@ model ProblemsInPlaylist {
   problem  Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
 
   @@unique([playlistId, problemId])
+}
+
+model Sheet {
+  id          String  @id @default(uuid())
+  title       String
+  description String?
+  slug        String  @unique
+
+  isPaid      Boolean @default(false)
+  price       Int?
+  currency    String? @default("INR")
+
+  isPublished Boolean @default(false)
+
+  createdById String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  problems  SheetProblem[]
+  purchases SheetPurchase[]
+}
+
+model SheetProblem {
+  id        String @id @default(uuid())
+  sheetId   String
+  problemId String
+
+  order Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sheet   Sheet   @relation(fields: [sheetId], references: [id], onDelete: Cascade)
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([sheetId, problemId])
+  @@index([sheetId, order])
+}
+
+model SheetPurchase {
+  id      String @id @default(uuid())
+
+  userId  String
+  sheetId String
+
+  amount   Int
+  currency String
+
+  status String @default("PENDING")
+
+  paymentProvider String?
+  paymentId       String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sheet Sheet @relation(fields: [sheetId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, sheetId])
+  @@index([sheetId])
 }

@@ -4,7 +4,10 @@ const ContributionHeatmap = ({ problems = [] }) => {
   const map = {};
 
   problems.forEach((p) => {
-    const date = new Date(p.updatedAt).toISOString().split("T")[0];
+    const solvedAt = p.solvedBy?.[0]?.createdAt ?? p.updatedAt;
+    const parsedDate = new Date(solvedAt);
+    if (Number.isNaN(parsedDate.getTime())) return;
+    const date = parsedDate.toISOString().split("T")[0];
     map[date] = (map[date] || 0) + 1;
   });
 

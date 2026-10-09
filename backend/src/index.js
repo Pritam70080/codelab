@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-import {authRouter, executionRouter, playlistRouter, problemRouter, submissionRouter} from "./routes/index.js";
+import {authRouter, executionRouter, playlistRouter, problemRouter, sheetRouter, submissionRouter} from "./routes/index.js";
 
 dotenv.config();
 
@@ -28,6 +28,7 @@ app.use("/api/v1/problems", problemRouter);
 app.use("/api/v1/execute-code", executionRouter);
 app.use("/api/v1/submission", submissionRouter);
 app.use("/api/v1/playlist", playlistRouter);
+app.use("/api/v1/sheet", sheetRouter);
 app.use((req, res) => {
     res.status(404).json({ message: "Route not found", success: false });
 })

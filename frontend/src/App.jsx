@@ -11,6 +11,8 @@ import LandingPage from './pages/LandingPage.jsx';
 import PageNotFound from './pages/PageNotFound.jsx';
 import AboutPage from './pages/AboutPage.jsx';
 import Profile from './pages/Profile.jsx';
+import ProfileUpdate from './pages/ProfileUpdate.jsx';
+import ProfileLayout from './layout/ProfileLayout.jsx';
 import ProblemPage from './pages/ProblemPage.jsx';
 import AddProblem from './pages/AddProblem.jsx';
 import AdminRoute from './components/AdminRoute.jsx';
@@ -19,6 +21,8 @@ import { useThemeStore } from './store/useThemeStore.js';
 import { useAuthStore } from './store/useAuthStore.js';
 import { Loader2 } from 'lucide-react';
 import EmailVerificationPage from './pages/EmailVerificationPage.jsx';
+import SheetsPage from './pages/SheetsPage.jsx';
+import SheetPage from './pages/SheetPage.jsx';
 
 const App = () => {
   const {authUser, isCheckingAuth, checkAuth} = useAuthStore();
@@ -51,8 +55,13 @@ const App = () => {
           <Route path="/" element={<Layout />}>
             <Route index element={<LandingPage />} />
             <Route path="/problems" element={authUser ? <HomePage /> : <Navigate to="/login" />} />
+            <Route path="/sheets" element={authUser ? <SheetsPage /> : <Navigate to="/login" />} />
+            <Route path="/sheets/:sheetId" element={authUser ? <SheetPage /> : <Navigate to="/login" />} />
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/profile" element={authUser ? <Profile/> : <Navigate to="/login" />}/>
+            <Route path="/profile" element={authUser ? <ProfileLayout /> : <Navigate to="/login" />}>
+              <Route index element={<Profile />} />
+              <Route path="update" element={<ProfileUpdate />} />
+            </Route>
           </Route>
           <Route path="/problem" element={<AdminRoute/>}>
             <Route path="add-problem" element={authUser ? <AddProblem/>: <Navigate to="/login" />}/>

@@ -31,7 +31,7 @@ const getDifficultyStyle = (difficulty) => {
 
 const SolvedProblemsTable = ({ problems = [], isLoading }) => {
   const sortedProblems = [...problems].sort(
-    (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+    (a, b) => new Date(b.solvedBy?.[0]?.createdAt ?? b.updatedAt) - new Date(a.solvedBy?.[0]?.createdAt ?? a.updatedAt)
   );
 
   if (isLoading) {
@@ -95,7 +95,7 @@ const SolvedProblemsTable = ({ problems = [], isLoading }) => {
 
                 {/* Time Ago */}
                 <td className="text-sm text-base-content/70 whitespace-nowrap">
-                  {getTimeAgo(problem.updatedAt)}
+                  {getTimeAgo(problem.solvedBy?.[0]?.createdAt ?? problem.updatedAt)}
                 </td>
               </tr>
             ))}

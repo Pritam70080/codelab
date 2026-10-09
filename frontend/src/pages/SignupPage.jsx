@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from "motion/react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
@@ -32,12 +32,14 @@ const SignupPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm({ resolver: zodResolver(SignupSchema) });
+  const navigate = useNavigate();
 
   const onSubmit = async (data) => {
     try {
       const { confirmPassword, ...payload } = data;
       console.log(data, " ", payload);
       await signup(payload);
+      navigate("/login");
     } catch (error) {
       console.error("Signup failed", error);
     }
@@ -101,12 +103,12 @@ const SignupPage = () => {
               <div className="form-control mb-2">
                 <label htmlFor="signup-c-password" className="label mb-2">Confirm Password</label>
                 <div className="relative">
-                  <input type={`${showPassword ? "text" : "password"}`} {...register("confirmPassword")} className={`input input-bordered ${errors.confirmPassword ? "input-error" : ""} px-10 w-full`} id="signup-x-password" placeholder="••••••••" />
+                  <input type={`${showConfirmPassword ? "text" : "password"}`} {...register("confirmPassword")} className={`input input-bordered ${errors.confirmPassword ? "input-error" : ""} px-10 w-full`} id="signup-x-password" placeholder="••••••••" />
                   <div className=" absolute flex items-center inset-y-0 left-2 pointer-events-none">
                     <Lock className="text-base-content/50" />
                   </div>
                   <button type="button" className="absolute right-2 inset-y-0 text-base-content/40 cursor-pointer" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                    {showPassword ? <Eye /> : <EyeOff />}
+                    {showConfirmPassword ? <Eye /> : <EyeOff />}
                   </button>
                 </div>
                 {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>}

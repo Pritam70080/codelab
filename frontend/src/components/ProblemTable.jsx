@@ -70,7 +70,7 @@ const ProblemTable = ({ problems }) => {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3, delay: 0.2, ease: "easeOut" }}
-      className="mt-10 px-2">
+      className="mt-2 px-2">
       <div className="md:text-right">
         <button className="btn btn-outline btn-primary rounded-xl" onClick={() => setIsCreateModalOpen(true)}>
           <Plus className="w-4 h-4" />

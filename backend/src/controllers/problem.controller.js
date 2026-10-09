@@ -1,4 +1,5 @@
 import { db } from "../libs/db.js";
+import { canAccessProblem } from "../libs/sheetAccess.js";
 import { getJudge0LanguageId, pollBatchResults, submitBatch } from "../libs/judge0.js";
 
 
@@ -85,6 +86,25 @@ export const createProblem = async (req, res) => {
 export const getAllProblems = async (req, res) => {
     try {
         const allProblems = await db.problem.findMany({
+            where: req.user.role === "ADMIN" ? undefined : {
+                OR: [
+                    { inSheets: { none: { sheet: { isPaid: true } } } },
+                    { inSheets: { some: { sheet: { isPublished: true, isPaid: false } } } },
+                    {
+                        inSheets: {
+                            some: {
+                                sheet: {
+                                    isPublished: true,
+                                    isPaid: true,
+                                    purchases: {
+                                        some: { userId: req.user.id, status: "COMPLETED" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
             include: {solvedBy: true}
         });
         if (!allProblems) {
@@ -110,6 +130,13 @@ export const getAllProblems = async (req, res) => {
 export const getProblemById = async (req, res) => {
     try {
         const { id } = req.params;
+        if (!(await canAccessProblem(id, req.user))) {
+            return res.status(403).json({
+                message: "Purchase the sheet to access this problem",
+                success: false,
+                requiresPurchase: true
+            });
+        }
         const problem = await db.problem.findUnique({
             where: {
                 id
