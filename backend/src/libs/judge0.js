@@ -1,5 +1,25 @@
 import axios from "axios";
 
+const getJudge0RequestConfig = () => {
+    const apiUrl = process.env.JUDGE0_API_URL;
+    if (!apiUrl) {
+        throw new Error("JUDGE0_API_URL must be configured");
+    }
+
+    const rapidApiKey = process.env.JUDGE0_RAPIDAPI_KEY?.trim();
+    const headers = rapidApiKey
+        ? {
+            "X-RapidAPI-Key": rapidApiKey,
+            "X-RapidAPI-Host": new URL(apiUrl).host
+        }
+        : undefined;
+
+    return {
+        baseUrl: apiUrl.replace(/\/+$/, ""),
+        headers
+    };
+}
+
 export const getJudge0LanguageId = (language) => {
     const languageMap = {
         "JAVA": 62,
@@ -22,9 +42,10 @@ export const getLanguageName = (id) => {
 }
 
 export const submitBatch = async (submissions) => {
-    const {data} = await axios.post(`${process.env.JUDGE0_API_URL}/submissions/batch?base64_encoded=false`, {
+    const { baseUrl, headers } = getJudge0RequestConfig();
+    const {data} = await axios.post(`${baseUrl}/submissions/batch?base64_encoded=false`, {
         submissions
-    } );
+    }, { headers });
     console.log("Submission Results: ", data);
     return data;//[{token}, {token}, {token}]
 }
@@ -33,11 +54,13 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const pollBatchResults = async (tokens) => {
     while(true) {
-        const {data} = await axios.get(`${process.env.JUDGE0_API_URL}/submissions/batch`, {
+        const { baseUrl, headers } = getJudge0RequestConfig();
+        const {data} = await axios.get(`${baseUrl}/submissions/batch`, {
             params: {
                 tokens: tokens.join(","),
                 base64_encoded: false,
-            }
+            },
+            headers
         });
         const results = data.submissions;
         const isAllDone = results.every((r) => r.status.id !== 1 && r.status.id !== 2);// or r.status.id >= 3

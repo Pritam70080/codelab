@@ -31,7 +31,7 @@ const AddProblemsToSheetModal = ({ isOpen, onClose, onSubmit, isSaving, existing
     <AnimatePresence>
       {isOpen && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-100 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
           onClick={closeModal}
         >
           <div className="card w-full max-w-lg bg-base-100 p-5" onClick={(event) => event.stopPropagation()}>

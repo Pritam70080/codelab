@@ -45,9 +45,9 @@ const Footer = () => {
           </Link>
           <p className="md:text-lg mt-4 text-justify">Learn, practice, and master coding with <span className="text-primary">structured sheets</span> and <span className="text-primary">real-world problems</span> — all in one place.</p>
           <div className="flex items-center gap-4 mt-4">
-            <a href="" target="_blank" className="hover:text-primary" ><Github /></a>
+            <a href="https://github.com/Pritam70080/codelab" target="_blank" className="hover:text-primary" ><Github /></a>
             <a href="" target="_blank" className="hover:text-primary"><Linkedin /></a>
-            <a href="" target="_blank" className="hover:text-primary"><Twitter /></a>
+            <a href="https://x.com/PritamPani10" target="_blank" className="hover:text-primary"><Twitter /></a>
           </div>
         </div>
         <div >

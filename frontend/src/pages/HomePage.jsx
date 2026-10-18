@@ -27,7 +27,7 @@ const HomePage = () => {
     <div
       className="min-h-[calc(100vh-5rem)] px-4 pb-8 pt-4"
     >
-      <section className="mb-5">
+      <section className="mb-3 mt-1">
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
             <h1 className="text-xl font-bold sm:text-2xl">Learning sheets</h1>
