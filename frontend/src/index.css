@@ -22,3 +22,23 @@
     }
   }
 }
+
+.auth-loading-progress > div {
+  animation: auth-loading-progress 1.6s ease-in-out infinite;
+}
+
+@keyframes auth-loading-progress {
+  0% {
+    transform: translateX(-110%);
+  }
+  100% {
+    transform: translateX(260%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-loading-progress > div {
+    animation: none;
+    width: 100%;
+  }
+}

@@ -1,4 +1,4 @@
-import React from 'react'
+import { useRef } from 'react'
 import { motion } from "motion/react"
 import { Link } from 'react-router-dom'
 import { pageTransition } from '../lib/pageTransition.js'
@@ -20,6 +20,8 @@ const codeSnippet =
 
 
 const LandingPage = () => {
+  const nextSectionRef = useRef(null);
+
   const fadeUp = {
     hidden: { opacity: 0, y: 40 },
     visible: {
@@ -49,9 +51,9 @@ const LandingPage = () => {
     >
       <div className="absolute top-22 -left-20 bg-primary blur-3xl opacity-30 h-1/8 w-1/3 rounded-lg"></div>
       <main>
-        <div className="w-67 mx-auto bg-primary/20 rounded-full mt-10 md:mt-15 flex items-center gap-1.5 p-1 px-2 ">
-          <div className="size-2.5 animate-pulse bg-primary rounded-full"></div>
-          Every expert was once a beginner
+        <div className="mx-auto mt-10 md:mt-15 flex w-fit max-w-full items-center gap-2 rounded-full bg-primary/20 px-3 py-2 text-xs sm:text-sm">
+          <span className="size-2.5 shrink-0 animate-pulse rounded-full bg-primary" aria-hidden="true"></span>
+          <span>Every expert was once a beginner</span>
         </div>
         <h1 className="text-4xl md:text-7xl font-semibold forn-mono mt-8 tracking-wide leading-tight">Start Your <span className="text-primary underline ">DSA</span> Journey With <br /><span className="text-primary ">CodeLab</span></h1>
         <p className="md:text-lg mt-5">Learn, practice, and master coding with <span className="text-primary">structured sheets</span> and <span className="text-primary">real-world problems</span> — all in one place.</p>
@@ -76,9 +78,21 @@ const LandingPage = () => {
         <motion.button
           animate={{ y: [0, 10, 0] }}
           transition={{ repeat: Infinity, duration: 1.3, ease: "easeInOut" }}
-          className="btn btn-ghost rounded-full text-2xl mt-8 hover:bg-base-100 hover:border-base-100 cursor-default"><ChevronDown /></motion.button>
+          type="button"
+          aria-label="Scroll to learn about CodeLab"
+          onClick={() => {
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            nextSectionRef.current?.scrollIntoView({
+              behavior: prefersReducedMotion ? 'auto' : 'smooth',
+              block: 'start',
+            });
+          }}
+          className="btn btn-ghost mt-8 cursor-pointer rounded-full text-2xl hover:border-base-100 hover:bg-base-100"
+        >
+          <ChevronDown aria-hidden="true" />
+        </motion.button>
       </main>
-      <section className="mt-36 px-4">
+      <section ref={nextSectionRef} className="mt-36 scroll-mt-6 px-4">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
 
           <motion.div
