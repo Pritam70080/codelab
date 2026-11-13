@@ -27,6 +27,24 @@
   animation: auth-loading-progress 1.6s ease-in-out infinite;
 }
 
+.problem-description-scroll {
+  scrollbar-color: color-mix(in srgb, currentColor 32%, transparent) transparent;
+  scrollbar-width: thin;
+}
+
+.problem-description-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.problem-description-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.problem-description-scroll::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, currentColor 32%, transparent);
+  border-radius: 9999px;
+}
+
 @keyframes auth-loading-progress {
   0% {
     transform: translateX(-110%);

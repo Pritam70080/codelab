@@ -86,8 +86,6 @@ const Footer = () => {
 
       </div>
       <div className="text-right my-4 text-xs px-4">
-        <div> Made with{" "}
-          <HeartIcon className="animate-pulse text-rose-400 inline size-5 -translate-y-0.5" /> by Pritam for Coders</div>
         <p>&copy; {new Date().getFullYear()} CodeLab. All rights reserved.</p>
       </div>
     </motion.footer>

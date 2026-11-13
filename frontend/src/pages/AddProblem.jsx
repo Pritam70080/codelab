@@ -3,6 +3,7 @@ import {motion} from "motion/react";
 
 import { pageTransition } from '../lib/pageTransition.js';
 import CreateProblemForm from '../components/CreateProblemForm.jsx';
+import Container from '../components/Container.jsx';
 
 const AddProblem = () => {
   return (
@@ -14,8 +15,9 @@ const AddProblem = () => {
 
       className="min-h-screen pt-4 px-4"
     >
-      
-      <CreateProblemForm />
+      <Container>
+        <CreateProblemForm />
+      </Container>
     </motion.div>
   )
 }

@@ -22,6 +22,7 @@ const SheetPage = () => {
     clearCurrentSheet,
   } = useSheetStore();
   const [isAddProblemsOpen, setIsAddProblemsOpen] = useState(false);
+  const [loadedSheetId, setLoadedSheetId] = useState(null);
   const isAdmin = authUser.role === "ADMIN";
   const isOwner = sheet?.createdById === authUser.id;
   const canManage = isAdmin && isOwner;
@@ -32,9 +33,15 @@ const SheetPage = () => {
   }, [getSheetDetails, getSheetProgress, sheetId]);
 
   useEffect(() => {
-    loadSheet();
-    return clearCurrentSheet;
-  }, [loadSheet, clearCurrentSheet]);
+    let isCurrentRequest = true;
+    loadSheet().then(() => {
+      if (isCurrentRequest) setLoadedSheetId(sheetId);
+    });
+    return () => {
+      isCurrentRequest = false;
+      clearCurrentSheet();
+    };
+  }, [loadSheet, clearCurrentSheet, sheetId]);
 
   const handleAddProblems = async (problemIds) => {
     const added = await addProblemsToSheet(sheetId, problemIds);
@@ -50,7 +57,7 @@ const SheetPage = () => {
     if (await reorderSheetProblems(sheetId, problemIds)) await loadSheet();
   };
 
-  if (isLoadingSheet) {
+  if (isLoadingSheet || loadedSheetId !== sheetId) {
     return <div className="flex min-h-[60vh] items-center justify-center"><Loader2 className="size-10 animate-spin text-primary" /></div>;
   }
   if (!sheet) return <Navigate to="/sheets" replace />;

@@ -7,7 +7,7 @@ const ProfileLayout = () => {
   const { authUser } = useAuthStore();
 
   return (
-    <section className="mx-auto grid min-h-screen w-full max-w-[1600px] grid-cols-1 gap-4 px-4 py-5 md:grid-cols-12 md:px-6">
+    <section className="grid min-h-screen w-full grid-cols-1 gap-4 px-3 py-5 sm:px-4 md:grid-cols-12 md:px-6">
       <div className="md:col-span-4 lg:col-span-3">
         <ProfileSidebar user={authUser} />
       </div>

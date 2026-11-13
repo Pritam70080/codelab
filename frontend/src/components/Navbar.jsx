@@ -46,7 +46,7 @@ const Navbar = () => {
         animate={{ opacity: 1, y: 0 }}
 
         transition={{ duration: 0.4, ease: "easeIn" }}
-        className={`sticky top-0 md:top-4 w-full md:w-[82%] mx-auto ${navbarBg[theme]} backdrop-blur-xl p-2 px-4 shadow-lg md:rounded-xl z-50`}>
+        className={`sticky top-0 z-50 mx-auto w-full max-w-6xl p-2 px-4 shadow-lg backdrop-blur-xl md:top-4 md:w-[82%] md:rounded-xl ${navbarBg[theme]}`}>
         <div className="flex items-center justify-between px-2">
           <Link to="/">
             <div className="flex items-center gap-2">

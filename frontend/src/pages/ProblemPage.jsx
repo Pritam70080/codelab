@@ -26,6 +26,7 @@ const ProblemPage = () => {
   const [code, setCode] = useState("");
   const [testCases, setTestCases] = useState([]);
   const [activeTab, setActiveTab] = useState("description");
+  const [resultTab, setResultTab] = useState("testcases");
 
   const editorTheme = {
     corporate: "vs-light",
@@ -63,13 +64,14 @@ const ProblemPage = () => {
     setCode(problem.codeSnippets?.[lang] || "");
   }
 
-  const handleRunCode = (e) => {
+  const handleRunCode = async (e) => {
     e.preventDefault();
     try {
       const language_id = getJudge0LanguageId(selectedLanguage);
       const stdin = problem.testCases.map((tc) => tc.input);
       const expected_outputs = problem.testCases.map((tc) => tc.output);
-      executeCode(code, language_id, stdin, expected_outputs);
+      await executeCode(code, language_id, stdin, expected_outputs);
+      setResultTab("result");
     } catch (error) {
       console.error("Error execution", error);
     }
@@ -82,6 +84,7 @@ const ProblemPage = () => {
       const stdin = problem.testCases.map((tc) => tc.input);
       const expected_outputs = problem.testCases.map((tc) => tc.output);
       await submitCode(code, language_id, stdin, id, expected_outputs );
+      setResultTab("result");
       setActiveTab("submissions");
     } catch (error) {
       console.error("Error submission", error);
@@ -210,34 +213,20 @@ const ProblemPage = () => {
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="min-h-screen px-2 w-full"
+      className="flex h-dvh max-h-dvh w-full flex-col overflow-hidden p-2"
     >
-      <nav className="pt-2 px-2 w-full pb-1.5 shadow-sm bg-base-100 rounded-xl">
-        {/* Back button with Problem Title */}
-        <div className="flex gap-2">
-          <Link to="/problems" className="text-primary flex gap-1 items-center hover:text-primary/80">
-            <Home className="size-6" />
-            <ChevronRight className="size6" />
-          </Link>
-          <span className="text-primary text-lg">{problem?.title}</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <div className="flex items-center text-base-content/70 mt-1 gap-1.5 text-sm">
-            <Clock className="hidden md:inline size-4" />
-            <span className="hidden md:inline">
-              Updated{" "}{new Date(problem?.updatedAt).toLocaleString("en-Us", { year: "numeric", month: "long", day: "numeric" })}
-            </span>
-            <span className="hidden md:inline text-base-content/30">•</span>
-            <Check className="size-5 md:size-4" />
-            <span>{submissionCount} Submissions</span>
-            <span className="hidden md:inline text-base-content/30">•</span>
-            <ThumbsUp className="hidden md:inline w-4 h-4" />
-            <span className="hidden md:inline">95% Success Rate</span>
+      <nav className="w-full shrink-0 rounded-xl bg-base-100 px-2 pb-1.5 pt-2 shadow-sm">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1">
+          <div className="col-start-1 row-start-1 flex min-w-0 gap-2">
+            <Link to="/problems" className="flex shrink-0 items-center gap-1 text-primary hover:text-primary/80">
+              <Home className="size-6" />
+              <ChevronRight className="size-6" />
+            </Link>
+            <span className="truncate text-lg text-primary">{problem?.title}</span>
           </div>
-          <div className="flex items-center gap-2 lg:gap-4 pr-2 lg:pr-10">
+          <div className="col-start-2 row-start-1 flex items-center gap-1.5 sm:gap-2">
             <button
-              className={`btn btn-ghost btn-circle ${isBookmarked ? "text-primary" : ""
-                }`}
+              className={`btn btn-ghost btn-circle ${isBookmarked ? "text-primary" : ""}`}
               onClick={() => setIsBookmarked(!isBookmarked)}
             >
               <Bookmark className="size-5" />
@@ -246,7 +235,7 @@ const ProblemPage = () => {
               <Share2 className="size-5" />
             </button>
             <select
-              className="select select-bordered select-primary w-40"
+              className="select select-bordered select-primary select-sm w-32 sm:select-md sm:w-40"
               value={selectedLanguage}
               onChange={handleLanguageChange}
             >
@@ -258,14 +247,46 @@ const ProblemPage = () => {
             </select>
           </div>
         </div>
+        <div className="mt-1 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 text-sm text-base-content/70">
+          <div className="col-start-1 flex min-w-0 items-center gap-1.5">
+            <Clock className="hidden md:inline size-4" />
+            <span className="hidden md:inline truncate">
+              Updated{" "}{new Date(problem?.updatedAt).toLocaleString("en-Us", { year: "numeric", month: "long", day: "numeric" })}
+            </span>
+            <span className="hidden md:inline text-base-content/30">•</span>
+            <Check className="size-5 md:size-4" />
+            <span className="hidden sm:inline">{submissionCount} Submissions</span>
+            <span className="sm:hidden">{submissionCount}</span>
+            <span className="hidden md:inline text-base-content/30">•</span>
+            <ThumbsUp className="hidden md:inline w-4 h-4" />
+            <span className="hidden md:inline">95% Success Rate</span>
+          </div>
+          <div className="col-start-2 flex items-center justify-center gap-2">
+            <button
+              className="btn btn-xs gap-1 rounded-lg btn-secondary sm:btn-sm sm:gap-1.5"
+              disabled={isExecuting}
+              onClick={handleRunCode}
+            >
+              {isExecuting ? <span className="loading loading-spinner loading-xs" /> : <Play className="size-4" />}
+              {isExecuting ? "Running..." : "Run"}
+            </button>
+            <button
+              className="btn btn-xs rounded-lg btn-primary sm:btn-sm"
+              disabled={isExecuting}
+              onClick={handleSubmitCode}
+            >
+              {isExecuting ? "Judging..." : "Submit"}
+            </button>
+          </div>
+        </div>
       </nav>
-      <div className="container p-2 mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-18 gap-2.5">
+      <div className="mt-2 min-h-0 flex-1">
+        <div className="grid h-full min-h-0 grid-cols-1 grid-rows-[minmax(0,0.7fr)_minmax(0,1.3fr)] gap-2.5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:grid-rows-1">
           {/* Left Side Description */}
-          <div className="card bg-base-100 shadow-xl col-span-8">
-            <div className="card-body p-0">
+          <div className="card min-h-0 overflow-hidden bg-base-100 shadow-xl">
+            <div className="card-body min-h-0 p-0">
               {/* Tabs */}
-              <div className="tabs tabs-bordered shadow-sm bg-base-200/80 rounded-t-lg">
+              <div className="tabs tabs-bordered shrink-0 overflow-x-auto rounded-t-lg bg-base-200/80 shadow-sm">
                 <button className={`tab gap-2 ${activeTab === "description" ? "tab-active" : ""}`}
                   onClick={() => setActiveTab("description")}
                 ><FileText className="size-4" /> Description</button>
@@ -295,7 +316,7 @@ const ProblemPage = () => {
                 </button>
               </div>
               {/* Tab Content */}
-              <div className="p-4 overflow-x-hidden">
+              <div className="problem-description-scroll min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-4">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={activeTab}
@@ -312,15 +333,15 @@ const ProblemPage = () => {
             </div>
           </div>
           {/* Right Side Code Part */}
-          <div className="card bg-base-200 shadow-xl rounded-t-lg col-span-10">
-            <div className="">
-              <div className="tabs tabs-bordered bg-base-200/80 rounded-t-lg">
+          <div className="card min-h-0 overflow-hidden rounded-t-lg bg-base-200 shadow-xl">
+            <div className="flex min-h-0 flex-[2] flex-col lg:flex-[6]">
+              <div className="tabs tabs-bordered shrink-0 rounded-t-lg bg-base-200/80">
                 <button className="tab tab-active gap-2">
                   <Terminal className="w-4 h-4" />
                   Code Editor
                 </button>
               </div>
-              <div className="h-90 w-full shadow-md">
+              <div className="min-h-0 flex-1 w-full shadow-md">
                 <Editor
                   height="100%"
                   language={selectedLanguage.toLowerCase()}
@@ -340,44 +361,54 @@ const ProblemPage = () => {
                   }}
                 />
               </div>
-              <div className="border-t-2 py-1.5 px-4 border-base-300 bg-base-200/80">
-                <div className="flex gap-2 items-center justify-end">
-                  <button className={`btn btn-sm btn-secondary rounded-lg ${isExecuting ? "loading" : ""}`}
-                    disabled={isExecuting}
-                    onClick={handleRunCode}
-                  >{isExecuting ? "" : <Play className="size-4" />}</button>
-                  <button className="btn btn-sm btn-primary rounded-lg"
-                    disabled={isExecuting}
-                    onClick={handleSubmitCode}
-                  >{isExecuting ? "judging..." : "Submit"}</button>
-                </div>
-              </div>
             </div>
             {/* TestCase Result */}
-            <div className="card bg-base-200/80 rounded-b-lg shadow-lg">
-              {submission ? (<SubmissionResults submission={submission} />) :
-                (<><div className="flex items-center justify-between pt-2.5 px-4">
-                  <h3 className="text-sm font-bold">Test Cases</h3>
-                </div>
-                  <div className="overflow-x-auto">
-                    <table className="table table-zebra w-full">
-                      <thead>
-                        <tr>
-                          <th className="text-sm">Input</th>
-                          <th className="text-sm">Expected Output</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {testCases.map((testCase, index) => (
-                          <tr key={index}>
-                            <td className="font-mono text-white"><span className="bg-black/80 px-2 py-0.5 rounded-lg">{testCase.input}</span></td>
-                            <td className="font-mono text-white"><span className="bg-black/80 px-2 py-0.5 rounded-lg">{testCase.output}</span></td>
+            <div className="flex min-h-0 flex-[1] flex-col overflow-hidden rounded-b-lg bg-base-200/80 shadow-lg lg:flex-[4]">
+              <div className="tabs tabs-bordered shrink-0 bg-base-200/80 px-2">
+                <button
+                  className={`tab gap-2 ${resultTab === "testcases" ? "tab-active" : ""}`}
+                  onClick={() => setResultTab("testcases")}
+                >
+                  Test Cases
+                </button>
+                <button
+                  className={`tab gap-2 ${resultTab === "result" ? "tab-active" : ""}`}
+                  onClick={() => setResultTab("result")}
+                >
+                  Result
+                </button>
+              </div>
+              <div className="problem-description-scroll min-h-0 flex-1 overflow-y-auto">
+                {resultTab === "result" && submission ? (
+                  <div className="p-3 sm:p-4"><SubmissionResults submission={submission} /></div>
+                ) : resultTab === "result" ? (
+                  <div className="p-4 text-sm text-base-content/70">Run or submit your code to see the result.</div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between px-4 pt-2.5">
+                      <h3 className="text-sm font-bold">Test Cases</h3>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="table table-zebra w-full">
+                        <thead>
+                          <tr>
+                            <th className="text-sm">Input</th>
+                            <th className="text-sm">Expected Output</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </>)}
+                        </thead>
+                        <tbody>
+                          {testCases.map((testCase, index) => (
+                            <tr key={index}>
+                              <td className="font-mono text-white"><span className="bg-black/80 px-2 py-0.5 rounded-lg">{testCase.input}</span></td>
+                              <td className="font-mono text-white"><span className="bg-black/80 px-2 py-0.5 rounded-lg">{testCase.output}</span></td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>

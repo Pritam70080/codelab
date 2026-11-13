@@ -23,11 +23,14 @@ import { Code2, Terminal } from 'lucide-react';
 import EmailVerificationPage from './pages/EmailVerificationPage.jsx';
 import SheetsPage from './pages/SheetsPage.jsx';
 import SheetPage from './pages/SheetPage.jsx';
+import Container from "./components/Container.jsx";
 
 const App = () => {
   const {authUser, isCheckingAuth, checkAuth} = useAuthStore();
   const location = useLocation();
   const { theme } = useThemeStore();
+  const isFullWidthPage = location.pathname.startsWith("/profile")
+    || /^\/problem\/[^/]+$/.test(location.pathname);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -104,7 +107,7 @@ const App = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto container">
+    <Container className={isFullWidthPage ? "min-h-screen w-full" : undefined}>
       <Toaster />
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
@@ -130,7 +133,7 @@ const App = () => {
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </AnimatePresence>
-    </div>
+    </Container>
   )
 }
 
